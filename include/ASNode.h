@@ -30,4 +30,20 @@ public:
 	void try_add_peer(ASNode* peer){
 		try_add_node(peer, peers_);
 	}
+	ostream& operator<<(ostream& os){
+		os << "ASN of " << asn_;
+		os << "\nProviders: \n\t";
+		for (const auto& var : providers_){
+			os << var->asn() << ", ";
+		}	
+		os << "\nCustomers: \n\t";
+		for (const auto& var : customers_){
+			os << var->asn() << ", ";
+		}
+		os << "\nPeers: \n\t";
+		for (const auto& var : peers_){
+			os << var->asn() << ",";
+		}
+		os << "\n";
+	}
 }

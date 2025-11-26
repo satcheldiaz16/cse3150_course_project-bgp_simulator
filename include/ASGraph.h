@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <iostream>
 
 #include "ASNode.h"
 
@@ -41,4 +42,11 @@ public:
 	}
 
 	void build_graph(const std::string& filepath);
+	
+	ostream& operator<<(ostream& os){
+		os << "Graph\n";
+		for(const auto& pair : as_nodes){
+			os << "ASN= " << pair.first << ", Node: " << pair.second << "\n";
+		}
+	}
 }
