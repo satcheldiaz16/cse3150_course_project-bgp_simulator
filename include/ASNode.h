@@ -1,3 +1,6 @@
+#pragma once
+
+#include <iostream>
 #include <vector>
 #include <algorithm>
 
@@ -7,9 +10,9 @@ class ASNode{
 	std::vector<ASNode*> customers_;
 	std::vector<ASNode*> peers_;
 	uint32_t asn_;
-	void try_add_node(ASNode* node_ptr, std::Vector<ASNode*>& relationships){
-		if(std::find(relationships.begin(), relationships.end(), node_ptr) != relationship.end()){
-			relationship.push_back(node_ptr);
+	void try_add_node(ASNode* node_ptr, std::vector<ASNode*>& relationships){
+		if(std::find(relationships.begin(), relationships.end(), node_ptr) != relationships.end()){
+			relationships.push_back(node_ptr);
 		}
 	}
 public:
@@ -17,10 +20,10 @@ public:
 	ASNode(uint32_t asn) {asn_ = asn;}
 	ASNode(const ASNode& other) = delete;
 	ASNode& operator=(const ASNode& other) = delete;
-	ASNode(ASNode&& other) = delete;
-	ASNode& operator=(ASNode&& other) = delete;
+	ASNode(ASNode&& other) = default;
+	ASNode& operator=(ASNode&& other) = default;
 	~ASNode(){}
-	uint32_t& asn const(){ return asn&; }
+	uint32_t& asn(){ return asn_; }
 	void try_add_prv(ASNode* prv){
 		try_add_node(prv, providers_);
 	}
@@ -30,20 +33,21 @@ public:
 	void try_add_peer(ASNode* peer){
 		try_add_node(peer, peers_);
 	}
-	ostream& operator<<(ostream& os){
-		os << "ASN of " << asn_;
+	friend std::ostream& operator<<(std::ostream& os, const ASNode& node){
+		os << "ASN of " << node.asn_;
 		os << "\nProviders: \n\t";
-		for (const auto& var : providers_){
+		for (const auto& var : node.providers_){
 			os << var->asn() << ", ";
 		}	
 		os << "\nCustomers: \n\t";
-		for (const auto& var : customers_){
+		for (const auto& var : node.customers_){
 			os << var->asn() << ", ";
 		}
 		os << "\nPeers: \n\t";
-		for (const auto& var : peers_){
+		for (const auto& var : node.peers_){
 			os << var->asn() << ",";
 		}
 		os << "\n";
+		return os;
 	}
-}
+};

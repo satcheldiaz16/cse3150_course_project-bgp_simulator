@@ -9,7 +9,10 @@
 class ASGraph{
 	uint32_t size_; //estimate size prior to parsing data, when done confirm the size and release any unused memory, or perhaps check the back of the file for the last asn
 	//std::vector<ASNode> as_nodes_;
-	std::unordered_map<uint32_t, ASNode> as_nodes;
+	std::unordered_map<uint32_t, ASNode> as_nodes_;
+	void tokenize_line(const std::string& line, std::vector<std::string>& vec);
+	void get_or_build_node(ASNode* noder_ptr, uint32_t& asn);
+	void try_modify_node_relationship(ASNode* prv, ASNode* cus, bool& money_involved);
 public:
 	ASGraph(){}
 	ASGraph(uint32_t size) {
@@ -20,33 +23,35 @@ public:
 	ASGraph& operator=(const ASGraph& other) = delete;
 	//using unordered_map without moving it means I can safely work with raw pointers without worrying
 	//about managing them, thus don't even allow movement
-	ASGraph(ASGraph&& other) = delete;
-	ASGraph& operator=(ASGraph&& other) = delete;
+	//I was capping my ass off here
+	ASGraph(ASGraph&& other) = default;
+	ASGraph& operator=(ASGraph&& other) = default;
 
 	/*
 	ASNode& go_to_asn const (const uint32_t& asn){
 		return as_nodes_[asn]&;
 	}
 	*/
-	ASNode* getNode const(uint32_t asn){
-		auto it = nodes.find(asn);
+	ASNode* getNode(uint32_t asn){
+		auto it = as_nodes_.find(asn);
 		//in this case, iterator is pointing to a std::pair, this is why we are returning it->second
-		return (it != nodes.end()) ? &it->second : nullptr;
+		return (it != as_nodes_.end()) ? &it->second : nullptr;
 	}
 	~ASGraph() {}
 	void insert_node_at(ASNode node, const uint32_t& idx){
 		as_nodes_[idx] = std::move(node);
 	}
-	uint32_t& size const(){
-		return size_&;
+	uint32_t& size() {
+		return size_;
 	}
 
-	void build_graph(const std::string& filepath);
+	int build_graph(const std::string& filepath);
 	
-	ostream& operator<<(ostream& os){
+	friend std::ostream& operator<<(std::ostream& os, const ASGraph& graph) {
 		os << "Graph\n";
-		for(const auto& pair : as_nodes){
+		for(auto& pair : graph.as_nodes_){
 			os << "ASN= " << pair.first << ", Node: " << pair.second << "\n";
 		}
+		return os;
 	}
-}
+};

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 vector<int> arena_as_path;
