@@ -16,7 +16,7 @@ public:
 	ASGraph(const ASGraph& other) = delete;
 	ASGraph& operator=(const ASGraph& other) = delete;
 	ASGraph(ASGraph&& other) = delete;
-	AsGraph& operator=(ASGraph&& other) = delete;
+	ASGraph& operator=(ASGraph&& other) = delete;
 
 
 	ASNode& go_to_asn const (const uint32_t& asn){
