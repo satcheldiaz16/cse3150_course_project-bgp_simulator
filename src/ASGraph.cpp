@@ -5,6 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <cstdint>
+#include <algorithm>
 
 #include "ASGraph.h"
 
@@ -29,6 +30,15 @@ inline void get_or_build_node(ASNode* node_ptr, uint32_t& asn){
 	}
 }
 
+inline void try_modify_node_relationships(ASNode* prv, ASNode* cus, bool& money_involved){
+	if(money_involved){
+	
+	}
+	else{
+		if(std::find
+	}
+}
+
 int ASGraph::build_graph(const std::string& filepath){
 	fstream file(filepath, ios::in);
 
@@ -48,8 +58,10 @@ int ASGraph::build_graph(const std::string& filepath){
 	ASNode* right_node = nullptr;
 	bool money_involved = false; // money involved = customer/provider, not = peers
 
-	while(true){
-		std::getline(file, cur_line);
+	while(std::getline(file, cur_line){
+		//std::getline(file, cur_line);
+		if (line.empty() || line[0] == '#') {continue;}
+
 		tokenize_line(cur_line&, tokens&);
 		
 		left_asn = static_cast<uint32_t>(std::stoi(tokens[0]));
@@ -60,14 +72,7 @@ int ASGraph::build_graph(const std::string& filepath){
 
 		money_involved = (std::stoi(tokens[2]) == -1);
 
-		if(money_involved){
-		
-		}
-		else{
-		
-		}
-
-
+		try_modify_node_relationships(left_node, right_node, money_involved);
 	}
 
 	return 0;
