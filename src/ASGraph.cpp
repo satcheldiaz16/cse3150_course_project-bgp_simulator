@@ -32,10 +32,12 @@ inline void get_or_build_node(ASNode* node_ptr, uint32_t& asn){
 
 inline void try_modify_node_relationships(ASNode* prv, ASNode* cus, bool& money_involved){
 	if(money_involved){
-	
+		prv->try_add_cus(cus);
+		cus->try_add_prv(prv);	
 	}
 	else{
-		if(std::find
+		prv->try_add_peer(cus);
+		cus->try_add_peer(prv);
 	}
 }
 
@@ -48,7 +50,7 @@ int ASGraph::build_graph(const std::string& filepath){
 	}
 
 	std::string cur_line;
-	//0 = left as, 1 = right as, 3 = relationship, 4 = policy
+	//0 = left as, 1 = right as, 2 = relationship, 3 = policy
 	std::vector<std::string> tokens;
 	tokens.reserve(4);
 	
@@ -73,6 +75,8 @@ int ASGraph::build_graph(const std::string& filepath){
 		money_involved = (std::stoi(tokens[2]) == -1);
 
 		try_modify_node_relationships(left_node, right_node, money_involved);
+		
+		//eventually will probably need to do something with token[3]
 	}
 
 	return 0;
