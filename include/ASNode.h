@@ -11,7 +11,7 @@ class ASNode{
 	std::vector<ASNode*> peers_;
 	uint32_t asn_;
 	void try_add_node(ASNode*& node_ptr, std::vector<ASNode*>& relationships){
-		if(std::find(relationships.begin(), relationships.end(), node_ptr) != relationships.end()){
+		if(std::find(relationships.begin(), relationships.end(), node_ptr) == relationships.end()){
 			relationships.push_back(node_ptr);
 		}
 	}
