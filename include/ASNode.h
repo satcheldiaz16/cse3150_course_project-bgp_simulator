@@ -10,7 +10,7 @@ class ASNode{
 	std::vector<ASNode*> customers_;
 	std::vector<ASNode*> peers_;
 	uint32_t asn_;
-	void try_add_node(ASNode* node_ptr, std::vector<ASNode*>& relationships){
+	void try_add_node(ASNode*& node_ptr, std::vector<ASNode*>& relationships){
 		if(std::find(relationships.begin(), relationships.end(), node_ptr) != relationships.end()){
 			relationships.push_back(node_ptr);
 		}
@@ -24,13 +24,13 @@ public:
 	ASNode& operator=(ASNode&& other) = default;
 	~ASNode(){}
 	uint32_t& asn(){ return asn_; }
-	void try_add_prv(ASNode* prv){
+	void try_add_prv(ASNode*& prv){
 		try_add_node(prv, providers_);
 	}
-	void try_add_cus(ASNode* cus){
+	void try_add_cus(ASNode*& cus){
 		try_add_node(cus, customers_);
 	}	
-	void try_add_peer(ASNode* peer){
+	void try_add_peer(ASNode*& peer){
 		try_add_node(peer, peers_);
 	}
 	friend std::ostream& operator<<(std::ostream& os, const ASNode& node){

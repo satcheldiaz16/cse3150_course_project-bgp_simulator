@@ -30,7 +30,7 @@ void ASGraph::get_or_build_node(ASNode*& node_ptr, uint32_t& asn){
 	}
 }
 
-void ASGraph::try_modify_node_relationship(ASNode* prv, ASNode* cus, bool& money_involved){
+void ASGraph::try_modify_node_relationship(ASNode*& prv, ASNode*& cus, bool& money_involved){
 	if(money_involved){
 		prv->try_add_cus(cus);
 		cus->try_add_prv(prv);	

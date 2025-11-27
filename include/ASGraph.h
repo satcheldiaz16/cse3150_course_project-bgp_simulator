@@ -12,7 +12,7 @@ class ASGraph{
 	std::unordered_map<uint32_t, ASNode> as_nodes_;
 	void tokenize_line(const std::string& line, std::vector<std::string>& vec);
 	void get_or_build_node(ASNode*& node_ptr, uint32_t& asn);
-	void try_modify_node_relationship(ASNode* prv, ASNode* cus, bool& money_involved);
+	void try_modify_node_relationship(ASNode*& prv, ASNode*& cus, bool& money_involved);
 public:
 	ASGraph(){}
 	ASGraph(uint32_t size) {
