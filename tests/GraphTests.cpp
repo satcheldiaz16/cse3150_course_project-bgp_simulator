@@ -15,7 +15,7 @@ public:
 TEST_F(GraphTest, TestInput1){
 	ASGraph graph;
 
-	graph.build_graph("test_input_1.txt");
+	graph.build_graph("../tests/test_input_1.txt");
 
 	std::cout << graph << std::endl;
 }

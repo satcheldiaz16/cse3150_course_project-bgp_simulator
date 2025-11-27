@@ -14,11 +14,11 @@ void ASGraph::tokenize_line(const std::string& line, std::vector<std::string>& v
 	std::stringstream ss(line);
 	for(int i = 0; i < 4; i++){
 		std::getline(ss, token, '|');
-		vec[i] = token;
+		vec.push_back(token);
 	}
 }
 
-void ASGraph::get_or_build_node(ASNode* node_ptr, uint32_t& asn){	
+void ASGraph::get_or_build_node(ASNode*& node_ptr, uint32_t& asn){	
 	if(node_ptr==nullptr || node_ptr->asn() != asn){
 		//check for existence, if not there create new
 		auto iter = as_nodes_.find(asn);
@@ -45,7 +45,7 @@ int ASGraph::build_graph(const std::string& filepath){
 	std::fstream file(filepath, std::ios::in);
 
 	if(!file.is_open()){
-		std::cerr << "Error: Unable to open file at" << filepath << std::endl;
+		std::cerr << "Error: Unable to open file at " << filepath << std::endl;
 		return 1;
 	}
 
@@ -63,7 +63,8 @@ int ASGraph::build_graph(const std::string& filepath){
 	while(std::getline(file, cur_line)){
 		//std::getline(file, cur_line);
 		if (cur_line.empty() || cur_line[0] == '#') {continue;}
-
+		
+		tokens.clear();
 		tokenize_line(cur_line, tokens);
 		
 		left_asn = static_cast<uint32_t>(std::stoi(tokens[0]));
