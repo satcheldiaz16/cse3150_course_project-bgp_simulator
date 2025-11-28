@@ -34,14 +34,14 @@ public:
 	void try_add_peer(ASNode*& peer){
 		try_add_node(peer, peers_);
 	}
-    size_t num_customers(){
+    size_t num_customers() const{
         return customers_.size();
     }
     uint32_t in_degree(){
-        return num_customers() - inverse_in_degree;
+        return num_customers() - inverse_in_degree_;
     }
     void process_customer(){
-        inverse_in_degree++;
+        inverse_in_degree_++;
     }
     std::vector<ASNode*>& providers() {return providers_;} 
 	friend std::ostream& operator<<(std::ostream& os, const ASNode& node){
