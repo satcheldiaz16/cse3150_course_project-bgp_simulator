@@ -18,7 +18,9 @@ void ASGraph::tokenize_line(const std::string& line, std::vector<std::string>& v
 	}
 }
 
-void ASGraph::get_or_build_node(ASNode*& node_ptr, uint32_t& asn){	
+//returns 0 if node is found, returns 1 if node is created
+int ASGraph::get_or_build_node(ASNode*& node_ptr, uint32_t& asn){	
+    int temp = 0;
 	if(node_ptr==nullptr || node_ptr->asn() != asn){
 		//check for existence, if not there create new
 		auto iter = as_nodes_.find(asn);
@@ -26,8 +28,10 @@ void ASGraph::get_or_build_node(ASNode*& node_ptr, uint32_t& asn){
 		else{
 			as_nodes_[asn] = ASNode(asn);
 			node_ptr = &as_nodes_[asn];
+            temp = 1;
 		}	
 	}
+    return temp;
 }
 
 void ASGraph::try_modify_node_relationship(ASNode*& prv, ASNode*& cus, bool& money_involved){
@@ -53,7 +57,9 @@ int ASGraph::build_graph(const std::string& filepath){
 	//0 = left as, 1 = right as, 2 = relationship, 3 = policy
 	std::vector<std::string> tokens;
 	tokens.reserve(4);
-	
+    
+    uint32_t nodes_created = 0;
+
 	uint32_t left_asn = 0;
 	ASNode* left_node = nullptr;
 	uint32_t right_asn = 0;
@@ -68,10 +74,10 @@ int ASGraph::build_graph(const std::string& filepath){
 		tokenize_line(cur_line, tokens);
 		
 		left_asn = static_cast<uint32_t>(std::stoi(tokens[0]));
-		get_or_build_node(left_node, left_asn);
+		nodes_created += get_or_build_node(left_node, left_asn);
 
 		right_asn = static_cast<uint32_t>(std::stoi(tokens[1]));
-		get_or_build_node(right_node, right_asn);
+		nodes_created += get_or_build_node(right_node, right_asn);
 
 		money_involved = (std::stoi(tokens[2]) == -1);
 
@@ -79,6 +85,8 @@ int ASGraph::build_graph(const std::string& filepath){
 		
 		//eventually will probably need to do something with token[3]
 	}
+
+    size_ = nodes_created;
 
 	return 0;
 }

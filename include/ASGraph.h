@@ -7,11 +7,12 @@
 #include "ASNode.h"
 
 class ASGraph{
+    std::vector<std::vector<ASNode*>> flattened_;
+	std::unordered_map<uint32_t, ASNode> as_nodes_;
 	uint32_t size_; //estimate size prior to parsing data, when done confirm the size and release any unused memory, or perhaps check the back of the file for the last asn
 	//std::vector<ASNode> as_nodes_;
-	std::unordered_map<uint32_t, ASNode> as_nodes_;
 	void tokenize_line(const std::string& line, std::vector<std::string>& vec);
-	void get_or_build_node(ASNode*& node_ptr, uint32_t& asn);
+	int get_or_build_node(ASNode*& node_ptr, uint32_t& asn);
 	void try_modify_node_relationship(ASNode*& prv, ASNode*& cus, bool& money_involved);
 public:
 	ASGraph(){}

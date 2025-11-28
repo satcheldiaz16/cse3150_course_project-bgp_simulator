@@ -10,6 +10,7 @@ class ASNode{
 	std::vector<ASNode*> customers_;
 	std::vector<ASNode*> peers_;
 	uint32_t asn_;
+    uint32_t inverse_in_degree_;
 	void try_add_node(ASNode*& node_ptr, std::vector<ASNode*>& relationships){
 		if(std::find(relationships.begin(), relationships.end(), node_ptr) == relationships.end()){
 			relationships.push_back(node_ptr);
@@ -33,6 +34,15 @@ public:
 	void try_add_peer(ASNode*& peer){
 		try_add_node(peer, peers_);
 	}
+    size_t num_customers(){
+        return customers_.size();
+    }
+    uint32_t in_degree(){
+        return num_customers() - inverse_in_degree;
+    }
+    void process_customer(){
+        inverse_in_degree++;
+    }
 	friend std::ostream& operator<<(std::ostream& os, const ASNode& node){
 		os << "ASN of " << node.asn_;
 		os << "\nProviders: \n\t";
