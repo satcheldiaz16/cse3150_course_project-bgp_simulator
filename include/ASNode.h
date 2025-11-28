@@ -43,6 +43,7 @@ public:
     void process_customer(){
         inverse_in_degree++;
     }
+    std::vector<ASNode*>& providers() {return providers_;} 
 	friend std::ostream& operator<<(std::ostream& os, const ASNode& node){
 		os << "ASN of " << node.asn_;
 		os << "\nProviders: \n\t";

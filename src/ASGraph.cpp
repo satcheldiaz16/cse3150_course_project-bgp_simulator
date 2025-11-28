@@ -88,5 +88,29 @@ int ASGraph::build_graph(const std::string& filepath){
 
     size_ = nodes_created;
 
+    //set rank 0 nodes
+    for(const auto& pair : as_nodes_){
+        if(pair.second.num_customers() == 0){
+            flattened_[0].push_back(ASNode* = &pair.second);
+        }
+    }
+
+    uint32_t nodes_processed = 0;
+    for(int rank = 0; rank < flattened_.size(); rank++){
+        for(int i = 0; i < flattened_[rank].size(); i++{
+            for(auto& prv : flattened_[rank][i].providers()){
+                prv->process_customer();
+                if(prv->in_degree() == 0){
+                    flattened_[rank+1].push_back(prv);
+                }
+            }
+            nodes_processed++;
+        }
+    }
+
+    if(nodes_processed < nodes_created){
+        return 1;
+    }
+
 	return 0;
 }
