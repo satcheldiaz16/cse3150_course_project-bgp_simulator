@@ -3,17 +3,18 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include <memory>
 
 #include "ASNode.h"
 
 class ASGraph{
-    std::vector<std::vector<ASNode*>> flattened_;
-	std::unordered_map<uint32_t, ASNode> as_nodes_;
+    std::vector<std::vector<uint32_t>> flattened_;
+	std::unordered_map<uint32_t, std::unique_ptr<ASNode>> as_nodes_;
 	uint32_t size_; //estimate size prior to parsing data, when done confirm the size and release any unused memory, or perhaps check the back of the file for the last asn
 	//std::vector<ASNode> as_nodes_;
 	void tokenize_line(const std::string& line, std::vector<std::string>& vec);
-	int get_or_build_node(ASNode*& node_ptr, uint32_t& asn);
-	void try_modify_node_relationship(ASNode*& prv, ASNode*& cus, bool& money_involved);
+	int get_or_build_node(ASNode& node, uint32_t& asn);
+	void try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money_involved);
 public:
 	ASGraph(){}
 	ASGraph(uint32_t size) {
@@ -33,14 +34,13 @@ public:
 		return as_nodes_[asn]&;
 	}
 	*/
-	ASNode* getNode(uint32_t asn){
-		auto it = as_nodes_.find(asn);
-		//in this case, iterator is pointing to a std::pair, this is why we are returning it->second
-		return (it != as_nodes_.end()) ? &it->second : nullptr;
+	ASNode& get_node(const uint32_t& asn){
+        //in this case, iterator is pointing to a std::pair, this is why we are returning it->second
+		return *as_nodes_[asn];
 	}
 	~ASGraph() {}
 	void insert_node_at(ASNode node, const uint32_t& idx){
-		as_nodes_[idx] = std::move(node);
+		as_nodes_[idx] = std::make_unique(node);
 	}
 	uint32_t& size() {
 		return size_;

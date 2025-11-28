@@ -19,29 +19,29 @@ void ASGraph::tokenize_line(const std::string& line, std::vector<std::string>& v
 }
 
 //returns 0 if node is found, returns 1 if node is created
-int ASGraph::get_or_build_node(ASNode*& node_ptr, uint32_t& asn){	
-    int temp = 0;
-	if(node_ptr==nullptr || node_ptr->asn() != asn){
+
+ASNode& ASGraph::get_or_build_node(uint32_t asn, uint32_t& nodes_created){	
+    ASNode& temp;
 		//check for existence, if not there create new
-		auto iter = as_nodes_.find(asn);
-		if(iter != as_nodes_.end()) { node_ptr = &(iter->second); }
-		else{
-			as_nodes_[asn] = ASNode(asn);
-			node_ptr = &as_nodes_[asn];
-            temp = 1;
+	auto iter = as_nodes_.find(asn);
+	if(iter != as_nodes_.end()) { temp = *(iter->second); }
+	else{
+			insert_node_at(ASNode(asn), asn);
+			temp = get_node(asn);
+            nodes_created++;
 		}	
 	}
     return temp;
 }
 
-void ASGraph::try_modify_node_relationship(ASNode*& prv, ASNode*& cus, bool& money_involved){
+void ASGraph::try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money_involved){
 	if(money_involved){
-		prv->try_add_cus(cus);
-		cus->try_add_prv(prv);	
+		prv.try_add_cus(cus.asn());
+		cus.try_add_prv(prv.asn());	
 	}
 	else{
-		prv->try_add_peer(cus);
-		cus->try_add_peer(prv);
+		prv.try_add_peer(cus.asn());
+		cus.try_add_peer(prv.asn());
 	}
 }
 
@@ -61,9 +61,9 @@ int ASGraph::build_graph(const std::string& filepath){
     uint32_t nodes_created = 0;
 
 	uint32_t left_asn = 0;
-	ASNode* left_node = nullptr;
+	ASNode& left_node;
 	uint32_t right_asn = 0;
-	ASNode* right_node = nullptr;
+	ASNode& right_node;
 	bool money_involved = false; // money involved = customer/provider, not = peers
 
 	while(std::getline(file, cur_line)){
@@ -74,10 +74,10 @@ int ASGraph::build_graph(const std::string& filepath){
 		tokenize_line(cur_line, tokens);
 		
 		left_asn = static_cast<uint32_t>(std::stoi(tokens[0]));
-		nodes_created += get_or_build_node(left_node, left_asn);
+		left_node = get_or_build_node(left_asn, nodes_created);
 
 		right_asn = static_cast<uint32_t>(std::stoi(tokens[1]));
-		nodes_created += get_or_build_node(right_node, right_asn);
+		right_node = get_or_build_node(right_asn, nodes_created);
 
 		money_involved = (std::stoi(tokens[2]) == -1);
 
@@ -89,18 +89,21 @@ int ASGraph::build_graph(const std::string& filepath){
     size_ = nodes_created;
 
     //set rank 0 nodes
+    //ref to unique ptr in this case, kind of gross but whatever
     for(auto& pair : as_nodes_){
-        if(pair.second.num_customers() == 0){
-            flattened_[0].push_back(&pair.second);
+        if(pair.second->num_customers() == 0){
+            flattened_[0].push_back(pair.second->asn());
         }
     }
 
     uint32_t nodes_processed = 0;
     for(int rank = 0; rank < flattened_.size(); rank++){
         for(int i = 0; i < flattened_[rank].size(); i++){
-            for(auto& prv : flattened_[rank][i]->providers()){
-                prv->process_customer();
-                if(prv->in_degree() == 0){
+            ASNode& node = get_node(flattened_[rank][i];
+            for(uint32_t prv : node.providers()){
+                ASNode& prv_node = get_node(prv);
+                prv_node.process_customer();
+                if(prv_node.in_degree() == 0){
                     flattened_[rank+1].push_back(prv);
                 }
             }
