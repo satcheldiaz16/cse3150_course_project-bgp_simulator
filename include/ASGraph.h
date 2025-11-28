@@ -13,7 +13,7 @@ class ASGraph{
 	uint32_t size_; //estimate size prior to parsing data, when done confirm the size and release any unused memory, or perhaps check the back of the file for the last asn
 	//std::vector<ASNode> as_nodes_;
 	void tokenize_line(const std::string& line, std::vector<std::string>& vec);
-	int get_or_build_node(ASNode& node, uint32_t& asn);
+	ASNode& get_or_build_node(uint32_t asn, uint32_t& nodes_created);
 	void try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money_involved);
 public:
 	ASGraph(){}
@@ -39,8 +39,8 @@ public:
 		return *as_nodes_[asn];
 	}
 	~ASGraph() {}
-	void insert_node_at(ASNode node, const uint32_t& idx){
-		as_nodes_[idx] = std::make_unique(node);
+	void insert_node_at(uint32_t asn){
+		as_nodes_.emplace(asn, std::make_unique<ASNode>(asn));
 	}
 	uint32_t& size() {
 		return size_;
