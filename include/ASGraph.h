@@ -51,7 +51,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const ASGraph& graph) {
 		os << "Graph\n";
 		for(auto& pair : graph.as_nodes_){
-			os << "ASN= " << pair.first << ", Node: " << pair.second << "\n";
+			os << "ASN= " << pair.first << ", Node: " << *pair.second << "\n";
 		}
 		return os;
 	}

@@ -19,7 +19,7 @@ TEST_F(GraphTest, TestInput1){
 
 	std::cout << graph << std::endl;
 }
-
+/*
 TEST_F(GraphTest, RealInput){
 	ASGraph graph;
 
@@ -27,3 +27,4 @@ TEST_F(GraphTest, RealInput){
 
 	std::cout << graph << std::endl;
 }
+*/

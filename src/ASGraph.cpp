@@ -21,16 +21,16 @@ void ASGraph::tokenize_line(const std::string& line, std::vector<std::string>& v
 //returns 0 if node is found, returns 1 if node is created
 
 ASNode& ASGraph::get_or_build_node(uint32_t asn, uint32_t& nodes_created){	
-    ASNode& temp;
 		//check for existence, if not there create new
 	auto iter = as_nodes_.find(asn);
-	if(iter != as_nodes_.end()) { temp = *(iter->second); }
-	else{
-			insert_node_at(ASNode(asn), asn);
-			temp = get_node(asn);
-            nodes_created++;
-		}	
-	}
+    
+    if(iter == as_nodes_.end()){
+        insert_node_at(asn);
+        nodes_created++;
+    }
+
+    ASNode& temp = get_node(asn);
+
     return temp;
 }
 
@@ -61,9 +61,9 @@ int ASGraph::build_graph(const std::string& filepath){
     uint32_t nodes_created = 0;
 
 	uint32_t left_asn = 0;
-	ASNode& left_node;
+	//ASNode& left_node;
 	uint32_t right_asn = 0;
-	ASNode& right_node;
+	//ASNode& right_node;
 	bool money_involved = false; // money involved = customer/provider, not = peers
 
 	while(std::getline(file, cur_line)){
@@ -74,10 +74,10 @@ int ASGraph::build_graph(const std::string& filepath){
 		tokenize_line(cur_line, tokens);
 		
 		left_asn = static_cast<uint32_t>(std::stoi(tokens[0]));
-		left_node = get_or_build_node(left_asn, nodes_created);
+		ASNode& left_node = get_or_build_node(left_asn, nodes_created);
 
 		right_asn = static_cast<uint32_t>(std::stoi(tokens[1]));
-		right_node = get_or_build_node(right_asn, nodes_created);
+		ASNode& right_node = get_or_build_node(right_asn, nodes_created);
 
 		money_involved = (std::stoi(tokens[2]) == -1);
 
@@ -95,11 +95,13 @@ int ASGraph::build_graph(const std::string& filepath){
             flattened_[0].push_back(pair.second->asn());
         }
     }
+    
+    return 0;
 
     uint32_t nodes_processed = 0;
     for(int rank = 0; rank < flattened_.size(); rank++){
         for(int i = 0; i < flattened_[rank].size(); i++){
-            ASNode& node = get_node(flattened_[rank][i];
+            ASNode& node = get_node(flattened_[rank][i]);
             for(uint32_t prv : node.providers()){
                 ASNode& prv_node = get_node(prv);
                 prv_node.process_customer();
