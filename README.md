@@ -1,3 +1,14 @@
 # cse3150_course_project
 
 caida link: https://publicdata.caida.org/datasets/as-relationships/serial-2/
+
+My ASGraph is structured as an std::unordered_map k:uint32_t v:unique_ptr to ASNode
+
+I chose an unordered map so I could index each node with their corresponding asn, as well as
+average case lookup time of O(1). However, this introduces undesireable hashing overhead.
+
+For each ASNode class, their relationships are stored in vectors of ASNode*. I can avoid worrying about ownership and manual memory management by using the pointers only as observers of the actual nodes themselves, which exist in the unordered map.
+
+I've done the same for my flattened graph; it also stores pointers to these ASNodes. This way, I can avoid the hashing overhead when I propogate announcements, without incuring the cost of shared pointers, or the hardship of manual memory management. Once the Graph is created, I intend on never moving it (doing so would surely break the program, given these design choices), so the location of all of the nodes is safe.
+
+When doing research into how to check for cycles, I noticed that the cycle check and the process for flattening the graph were basically the same, even tho they were listed very far apart in the project instructions, and upon further investigation determined I could do both at once for effeciencies sake.

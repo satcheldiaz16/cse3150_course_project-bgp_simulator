@@ -4,11 +4,12 @@
 #include <unordered_map>
 #include <iostream>
 #include <memory>
+#include<vector>
 
 #include "ASNode.h"
 
 class ASGraph{
-    std::vector<std::vector<uint32_t>> flattened_;
+    std::vector<std::vector<ASNode*>> flattened_;
 	std::unordered_map<uint32_t, std::unique_ptr<ASNode>> as_nodes_;
 	uint32_t size_; //estimate size prior to parsing data, when done confirm the size and release any unused memory, or perhaps check the back of the file for the last asn
 	//std::vector<ASNode> as_nodes_;
@@ -17,12 +18,12 @@ class ASGraph{
 	void try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money_involved);
 public:
 	ASGraph(){
-        flattened_.push_back(std::vector<uint32_t>());
+        flattened_.push_back(std::vector<ASNode*>());
         size_ = 80000;
     }
 	ASGraph(uint32_t size) {
 		as_nodes_.reserve(size);
-        flattened_.push_back(std::vector<uint32_t>());
+        flattened_.push_back(std::vector<ASNode*>());
 		size_ = size;
 	}
 	ASGraph(const ASGraph& other) = delete;

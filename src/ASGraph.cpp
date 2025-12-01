@@ -37,12 +37,12 @@ ASNode& ASGraph::get_or_build_node(uint32_t asn, uint32_t& nodes_created){
 //adds to either provider/customer relations or peer->peer relations
 void ASGraph::try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money_involved){
 	if(money_involved){
-		prv.try_add_cus(cus.asn());
-		cus.try_add_prv(prv.asn());	
+		prv.try_add_cus(&cus);
+		cus.try_add_prv(&prv);	
 	}
 	else{
-		prv.try_add_peer(cus.asn());
-		cus.try_add_peer(prv.asn());
+		prv.try_add_peer(&cus);
+		cus.try_add_peer(&prv);
 	}
 }
 
@@ -95,7 +95,7 @@ int ASGraph::build_graph(const std::string& filepath){
     //iterate through until
     for(auto& pair : as_nodes_){
         if(pair.second->num_customers() == 0){
-            flattened_[0].push_back(pair.second->asn());
+            flattened_[0].push_back(&(*pair.second));
         }
     }
 
@@ -104,24 +104,24 @@ int ASGraph::build_graph(const std::string& filepath){
     //build out rank 1 first, then i can iterate all the way through one rank and move on to the next
     for(int rank = 0; rank < flattened_.size(); rank++){
         
-        for(int i = 0; i < flattened_[rank].size(); i++){
+        for(int node = 0; node < flattened_[rank].size(); node++){
        
-            ASNode& node = get_node(flattened_[rank][i]);
+            //ASNode& node = get_node(flattened_[rank][i]);
        
-            for(uint32_t prv : node.providers()){
+            for(ASNode* prv_node : flattened_[rank][node]->providers()){
        
-                ASNode& prv_node = get_node(prv);
+               // ASNode& prv_node = get_node(prv);
        
-                prv_node.process_customer();
+                prv_node->process_customer();
        
-                if(prv_node.in_degree() == 0){
+                if(prv_node->in_degree() == 0){
        
                     if(flattened_.size() == rank+1) {
        
-                        flattened_.push_back(std::vector<uint32_t>());
+                        flattened_.push_back(std::vector<ASNode*>());
                     }
        
-                    flattened_[rank+1].push_back(prv);
+                    flattened_[rank+1].push_back(prv_node);
                 }
             }
        
