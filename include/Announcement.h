@@ -19,7 +19,7 @@ public:
 	short relationship; // 0 for customers, 1 for peers, 2 for providers, 3 for origin
 	//4 bytes
 	uint32_t next_hop_asn;
-
+    bool rov_invalid;
 	//size of this will be large
 	// 53 - 56 bytes
 	// all of these things will be moved to an 8 byte boundary
