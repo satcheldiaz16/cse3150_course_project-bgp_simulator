@@ -25,5 +25,6 @@ TEST_F(GraphTest, RealInput){
 
 	graph.build_graph("../data/20250901.as-rel2.txt");
 
-	std::cout << graph << std::endl;
+	//std::cout << graph << std::endl;
 }
+
