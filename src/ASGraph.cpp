@@ -9,17 +9,17 @@
 
 #include "ASGraph.h"
 
+//splits input into array of [cur_node, other_node, relationship] for easier usage
 void ASGraph::tokenize_line(const std::string& line, std::vector<std::string>& vec){
 	std::string token;
 	std::stringstream ss(line);
-	for(int i = 0; i < 4; i++){
+	for(int i = 0; i < 3; i++){
 		std::getline(ss, token, '|');
 		vec.push_back(token);
 	}
 }
 
-//returns 0 if node is found, returns 1 if node is created
-
+//gets or builds node with ASN asn
 ASNode& ASGraph::get_or_build_node(uint32_t asn, uint32_t& nodes_created){	
 		//check for existence, if not there create new
 	auto iter = as_nodes_.find(asn);
@@ -34,6 +34,7 @@ ASNode& ASGraph::get_or_build_node(uint32_t asn, uint32_t& nodes_created){
     return temp;
 }
 
+//adds to either provider/customer relations or peer->peer relations
 void ASGraph::try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money_involved){
 	if(money_involved){
 		prv.try_add_cus(cus.asn());
@@ -54,9 +55,9 @@ int ASGraph::build_graph(const std::string& filepath){
 	}
 
 	std::string cur_line;
-	//0 = left as, 1 = right as, 2 = relationship, 3 = policy
+	//0 = left as, 1 = right as, 2 = relationship, only reserving 3 cause policy is unused
 	std::vector<std::string> tokens;
-	tokens.reserve(4);
+	tokens.reserve(3);
     
     uint32_t nodes_created = 0;
 
@@ -99,25 +100,38 @@ int ASGraph::build_graph(const std::string& filepath){
     }
 
     uint32_t nodes_processed = 0;
+    
+    //build out rank 1 first, then i can iterate all the way through one rank and move on to the next
     for(int rank = 0; rank < flattened_.size(); rank++){
+        
         for(int i = 0; i < flattened_[rank].size(); i++){
+       
             ASNode& node = get_node(flattened_[rank][i]);
+       
             for(uint32_t prv : node.providers()){
+       
                 ASNode& prv_node = get_node(prv);
+       
                 prv_node.process_customer();
+       
                 if(prv_node.in_degree() == 0){
+       
                     if(flattened_.size() == rank+1) {
+       
                         flattened_.push_back(std::vector<uint32_t>());
                     }
+       
                     flattened_[rank+1].push_back(prv);
                 }
             }
+       
             nodes_processed++;
         }
     }
 
     std::cout << "num ranks = " << flattened_.size() << std::endl;
 
+    //in other words if there is a cycle
     if(nodes_processed < nodes_created){
         return 1;
     }
