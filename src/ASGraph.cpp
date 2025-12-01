@@ -60,6 +60,79 @@ void ASGraph::build_input_clique(std::string& cur_line, uint32_t& nodes_created)
     } 
 }
 
+void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){ 
+    //set rank 0 nodes
+    //ref to unique ptr in this case, kind of gross but whatever
+    //
+    //iterate through until
+    for(auto& pair : as_nodes_){
+        if(pair.second->num_customers() == 0){
+            flattened_[0].push_back(&(*pair.second));
+        }
+    }
+
+    //build out rank 0 first, then i can iterate all the way through one rank and move on to the next
+    for(int rank = 0; rank < flattened_.size(); rank++){
+        
+        for(int node = 0; node < flattened_[rank].size(); node++){
+       
+            //ASNode& node = get_node(flattened_[rank][i]);
+       
+            for(ASNode* prv_node : flattened_[rank][node]->providers()){
+       
+               // ASNode& prv_node = get_node(prv);
+       
+                prv_node->increment_in_degree();
+       
+                if(prv_node->in_degree() == 0){
+       
+                    if(flattened_.size() == rank+1) {
+       
+                        flattened_.push_back(std::vector<ASNode*>());
+                    }
+       
+                    flattened_[rank+1].push_back(prv_node);
+                }
+            }
+       
+            nodes_processed++;
+        }
+    }
+}
+
+void ASGraph::flatten_top_down(uint32_t& nodes_processed){
+    for(int rank = 0; rank < flattened_.size(); rank++){
+        
+        for(int node = 0; node < flattened_[rank].size(); node++){
+       
+            //ASNode& node = get_node(flattened_[rank][i]);
+       
+            for(ASNode* cus_node : flattened_[rank][node]->customers()){
+       
+               // ASNode& prv_node = get_node(prv);
+       
+                cus_node->increment_in_degree();
+       
+                //false denotes flattening top down
+                if(prv_node->in_degree(false) == 0){
+       
+                    if(flattened_.size() == rank+1) {
+       
+                        flattened_.push_back(std::vector<ASNode*>());
+                    }
+       
+                    flattened_[rank+1].push_back(cus_node);
+                }
+            }
+       
+            nodes_processed++;
+        }
+    }
+
+    //reverse flattened_ since flattening top down
+    std::reverse(flattened_.begin(), flattened_.end());
+}
+
 int ASGraph::build_graph(const std::string& filepath){
 	std::fstream file(filepath, std::ios::in);
 
@@ -108,50 +181,15 @@ int ASGraph::build_graph(const std::string& filepath){
 	}
 
     size_ = nodes_created;
-
-    //set rank 0 nodes
-    //ref to unique ptr in this case, kind of gross but whatever
-    //
-    //iterate through until
-    for(auto& pair : as_nodes_){
-        if(pair.second->num_customers() == 0){
-            flattened_[0].push_back(&(*pair.second));
-        }
-    }
-
+    
     uint32_t nodes_processed = 0;
     
-    //build out rank 1 first, then i can iterate all the way through one rank and move on to the next
-    for(int rank = 0; rank < flattened_.size(); rank++){
-        
-        for(int node = 0; node < flattened_[rank].size(); node++){
-       
-            //ASNode& node = get_node(flattened_[rank][i]);
-       
-            for(ASNode* prv_node : flattened_[rank][node]->providers()){
-       
-               // ASNode& prv_node = get_node(prv);
-       
-                prv_node->process_customer();
-       
-                if(prv_node->in_degree() == 0){
-       
-                    if(flattened_.size() == rank+1) {
-       
-                        flattened_.push_back(std::vector<ASNode*>());
-                    }
-       
-                    flattened_[rank+1].push_back(prv_node);
-                }
-            }
-       
-            nodes_processed++;
-        }
-    }
+    //if input clique was obtained, flatten top down, else bottom up
+    flattened_[0].size() > 0 ? flatten_top_down(nodes_processed) : flatten_bottom_up(nodes_processed);
 
     std::cout << "num ranks = " << flattened_.size() << std::endl;
 
-    //in other words if there is a cycle
+    //if there is a cycle error out
     if(nodes_processed < nodes_created){
         return 1;
     }
