@@ -90,13 +90,13 @@ int ASGraph::build_graph(const std::string& filepath){
 
     //set rank 0 nodes
     //ref to unique ptr in this case, kind of gross but whatever
+    //
+    //iterate through until
     for(auto& pair : as_nodes_){
         if(pair.second->num_customers() == 0){
             flattened_[0].push_back(pair.second->asn());
         }
     }
-    
-    return 0;
 
     uint32_t nodes_processed = 0;
     for(int rank = 0; rank < flattened_.size(); rank++){
@@ -106,12 +106,17 @@ int ASGraph::build_graph(const std::string& filepath){
                 ASNode& prv_node = get_node(prv);
                 prv_node.process_customer();
                 if(prv_node.in_degree() == 0){
+                    if(flattened_.size() == rank+1) {
+                        flattened_.push_back(std::vector<uint32_t>());
+                    }
                     flattened_[rank+1].push_back(prv);
                 }
             }
             nodes_processed++;
         }
     }
+
+    std::cout << "num ranks = " << flattened_.size() << std::endl;
 
     if(nodes_processed < nodes_created){
         return 1;

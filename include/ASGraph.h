@@ -16,9 +16,13 @@ class ASGraph{
 	ASNode& get_or_build_node(uint32_t asn, uint32_t& nodes_created);
 	void try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money_involved);
 public:
-	ASGraph(){}
+	ASGraph(){
+        flattened_.push_back(std::vector<uint32_t>());
+        size_ = 80000;
+    }
 	ASGraph(uint32_t size) {
 		as_nodes_.reserve(size);
+        flattened_.push_back(std::vector<uint32_t>());
 		size_ = size;
 	}
 	ASGraph(const ASGraph& other) = delete;
