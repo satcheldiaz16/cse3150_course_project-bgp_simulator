@@ -16,6 +16,7 @@ class ASGraph{
 	void tokenize_line(const std::string& line, std::vector<std::string>& vec);
 	ASNode& get_or_build_node(uint32_t asn, uint32_t& nodes_created);
 	void try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money_involved);
+    void build_input_clique(std::string& cur_line, uint32_t& nodes_created);
 public:
 	ASGraph(){
         flattened_.push_back(std::vector<ASNode*>());

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cstdint>
 #include <algorithm>
+#include <cctype> //for isdigit()
 
 #include "ASGraph.h"
 
@@ -46,6 +47,19 @@ void ASGraph::try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money
 	}
 }
 
+void ASGraph::build_input_clique(std::string& cur_line, uint32_t& nodes_created){
+    std::string token;
+    std::stringstream ss(cur_line);
+    uint32_t asn;
+    while(std::getline(ss, token, ' '){
+        if(!isdigit(asn[0]) {continue;}
+
+        asn = std::stoi(token);
+        ASNode& as = get_or_build_node(asn, nodes_created);
+        flattened_[0].push_back(&as);
+    } 
+}
+
 int ASGraph::build_graph(const std::string& filepath){
 	std::fstream file(filepath, std::ios::in);
 
@@ -66,10 +80,16 @@ int ASGraph::build_graph(const std::string& filepath){
 	uint32_t right_asn = 0;
 	//ASNode& right_node;
 	bool money_involved = false; // money involved = customer/provider, not = peers
-
+    
 	while(std::getline(file, cur_line)){
-		//std::getline(file, cur_line);
-		if (cur_line.empty() || cur_line[0] == '#') {continue;}
+
+		if (cur_line.empty() || cur_line[0] == '#') {      
+	        // input clique scenario
+            if(cur_line.substr(4) == "# in"){
+                build_input_clique(cur_line, nodes_created);
+            }
+            else { continue;}
+        }
 		
 		tokens.clear();
 		tokenize_line(cur_line, tokens);
