@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <cctype> //for isdigit()
+#include <unordered_set>
 
 #include "ASGraph.h"
 
@@ -106,7 +107,32 @@ void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){
 
 void ASGraph::flatten_top_down(uint32_t& nodes_processed){
     std::cout << "flattening top-down" << std::endl;
+    std::unordered_set<ASNode*> visited;
 
+    for (ASNode* n : flattened_[0]){
+        visited.insert(n);
+    }
+
+    for (size_t rank = 0; rank < flattened_.size(); rank++){
+        
+        for (ASNode* node : flattened_[rank]) {
+
+            for (ASNode* cus_node : node->customers()){
+                if(!visited.count(cus_node)){
+                
+                    if(flattened_.size() == rank + 1){
+                        flattened_.push_back(std::vector<ASNode*>());
+                    }
+
+                    flattened_[rank+1].push_back(cus_node);
+                    visited.insert(cus_node);
+                }
+            }    
+
+         nodes_processed++;  
+         }
+    }
+    /*
     for(int rank = 0; rank < flattened_.size(); rank++){
         
         for(int node = 0; node < flattened_[rank].size(); node++){
@@ -137,6 +163,7 @@ void ASGraph::flatten_top_down(uint32_t& nodes_processed){
 
     //reverse flattened_ since flattening top down
     std::reverse(flattened_.begin(), flattened_.end());
+    */
 }
 
 int ASGraph::build_graph(const std::string& filepath){
