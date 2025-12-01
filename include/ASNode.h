@@ -5,10 +5,10 @@
 #include <algorithm>
 
 class ASNode{
-	//local rib
 	std::vector<ASNode*> providers_;
 	std::vector<ASNode*> customers_;
 	std::vector<ASNode*> peers_;
+    std::unique_ptr<Policy> policy_;
 	uint32_t asn_;
     uint32_t inverse_in_degree_;
 	void try_add_node(ASNode* asn, std::vector<ASNode*>& relationships){
@@ -18,7 +18,10 @@ class ASNode{
 	}
 public:
 	ASNode() {}
-	ASNode(uint32_t asn) {asn_ = asn;}
+	ASNode(uint32_t asn, bool use_rov = false) {
+        asn_ = asn;
+        policy_ = use_rov ? std::make_unique<ROV>() : std::make_unique<BGP>();
+    }
 	ASNode(const ASNode& other) = delete;
 	ASNode& operator=(const ASNode& other) = delete;
 	ASNode(ASNode&& other) = default;
@@ -48,6 +51,7 @@ public:
     }
     std::vector<ASNode*>& providers() {return providers_;} 
     std::vector<ASNode*>& customers() {return customers_;}
+    Policy* policy() { return policy_.get(); }
 	friend std::ostream& operator<<(std::ostream& os, const ASNode& node){
 		os << "ASN of " << node.asn_;
 		os << "\nProviders: \n\t";
