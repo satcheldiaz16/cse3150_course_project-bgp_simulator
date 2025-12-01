@@ -87,7 +87,7 @@ void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){
        
                // ASNode& prv_node = get_node(prv);
        
-                prv_node->increment_in_degree();
+                prv_node->decrement_in_degree();
        
                 if(prv_node->in_degree() == 0){
        
@@ -105,42 +105,11 @@ void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){
     }
 }
 
-int ASGraph::flatten_top_down(uint32_t& nodes_processed){
+void ASGraph::flatten_top_down(uint32_t& nodes_processed){
     std::cout << "flattening top-down" << std::endl;
     
     if (flattened_[0].empty()) return;
 
-    std::unordered_set<ASNode*> visited;
-    std::vector<ASNode*> frontier = flattened_[0];
-
-    visited.insert(frontier.begin(), frontier.end());
-
-    
-    /*
-    for (ASNode* n : flattened_[0]){
-        visited.insert(n);
-    }
-
-    for (size_t rank = 0; rank < flattened_.size(); rank++){
-        
-        for (ASNode* node : flattened_[rank]) {
-
-            for (ASNode* cus_node : node->customers()){
-                if(!visited.count(cus_node)){
-                
-                    if(flattened_.size() == rank + 1){
-                        flattened_.push_back(std::vector<ASNode*>());
-                    }
-
-                    flattened_[rank+1].push_back(cus_node);
-                    visited.insert(cus_node);
-                }
-            }    
-
-         nodes_processed++;  
-         }
-    }
-   
     for(int rank = 0; rank < flattened_.size(); rank++){
         
         for(int node = 0; node < flattened_[rank].size(); node++){
@@ -151,7 +120,7 @@ int ASGraph::flatten_top_down(uint32_t& nodes_processed){
        
                // ASNode& prv_node = get_node(prv);
        
-                cus_node->increment_in_degree();
+                cus_node->decrement_in_degree();
        
                 //false denotes flattening top down
                 if(cus_node->in_degree(false) == 0){
@@ -171,7 +140,6 @@ int ASGraph::flatten_top_down(uint32_t& nodes_processed){
 
     //reverse flattened_ since flattening top down
     std::reverse(flattened_.begin(), flattened_.end());
-    */
 }
 
 int ASGraph::build_graph(const std::string& filepath){
@@ -199,7 +167,7 @@ int ASGraph::build_graph(const std::string& filepath){
         
 		if (cur_line.empty() || cur_line[0] == '#') {      
 	        // input clique scenario
-            if(cur_line.rfind(input_clique_prefix, 0) == 0){
+            if(cur_line.rfind(input_clique_prefix, 0) == 0 && false){
                 build_input_clique(cur_line, nodes_created);
             }
             

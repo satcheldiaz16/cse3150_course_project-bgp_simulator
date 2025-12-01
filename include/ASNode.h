@@ -43,7 +43,7 @@ public:
     uint32_t in_degree(bool bottom_up = true){
         return (bottom_up ? num_customers() : num_providers()) - inverse_in_degree_;
     }
-    void increment_in_degree(){
+    void decrement_in_degree(){
         inverse_in_degree_++;
     }
     std::vector<ASNode*>& providers() {return providers_;} 
