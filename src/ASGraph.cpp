@@ -47,15 +47,17 @@ void ASGraph::try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money
 	}
 }
 
-void ASGraph::build_input_clique(std::string& cur_line, uint32_t& nodes_created){
-    std::cout << "we are in here" << std::endl;
-    std::string token;
-    std::stringstream ss(cur_line);
-    uint32_t asn;
-    while(std::getline(ss, token, ' ')){
-        if(!isdigit(token[0])) {continue;}
+const std::string input_clique_prefix = "# input clique:";
 
-        asn = std::stoi(token);
+void ASGraph::build_input_clique(const std::string& cur_line, uint32_t& nodes_created){
+    std::cout << "we are in here" << std::endl;
+    //std::string token;
+    std::string line = cur_line.substr(input_clique_prefix.size());
+    std::istringstream iss(line);
+    uint32_t asn;
+    while(iss >> asn){
+        //if(!isdigit(token[0])) {continue;}
+        //asn = std::stoi(token);
         ASNode& as = get_or_build_node(asn, nodes_created);
         flattened_[0].push_back(&as);
     } 
@@ -157,17 +159,16 @@ int ASGraph::build_graph(const std::string& filepath){
 	uint32_t right_asn = 0;
 	//ASNode& right_node;
 	bool money_involved = false; // money involved = customer/provider, not = peers
-    const std::string input_clique_format = "# in";
-
 
 	while(std::getline(file, cur_line)){
         
 		if (cur_line.empty() || cur_line[0] == '#') {      
 	        // input clique scenario
-            if(cur_line.rfind(input_clique_format, 0) == 0){
+            if(cur_line.rfind(input_clique_prefix, 0) == 0){
                 build_input_clique(cur_line, nodes_created);
             }
-            else { continue;}
+            
+            continue;
         }
 		
 		tokens.clear();
