@@ -105,10 +105,18 @@ void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){
     }
 }
 
-void ASGraph::flatten_top_down(uint32_t& nodes_processed){
+int ASGraph::flatten_top_down(uint32_t& nodes_processed){
     std::cout << "flattening top-down" << std::endl;
-    std::unordered_set<ASNode*> visited;
+    
+    if (flattened_[0].empty()) return;
 
+    std::unordered_set<ASNode*> visited;
+    std::vector<ASNode*> frontier = flattened_[0];
+
+    visited.insert(frontier.begin(), frontier.end());
+
+    
+    /*
     for (ASNode* n : flattened_[0]){
         visited.insert(n);
     }
@@ -132,7 +140,7 @@ void ASGraph::flatten_top_down(uint32_t& nodes_processed){
          nodes_processed++;  
          }
     }
-    /*
+   
     for(int rank = 0; rank < flattened_.size(); rank++){
         
         for(int node = 0; node < flattened_[rank].size(); node++){
