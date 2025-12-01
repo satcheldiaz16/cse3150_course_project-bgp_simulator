@@ -51,8 +51,8 @@ void ASGraph::build_input_clique(std::string& cur_line, uint32_t& nodes_created)
     std::string token;
     std::stringstream ss(cur_line);
     uint32_t asn;
-    while(std::getline(ss, token, ' '){
-        if(!isdigit(asn[0]) {continue;}
+    while(std::getline(ss, token, ' ')){
+        if(!isdigit(token[0])) {continue;}
 
         asn = std::stoi(token);
         ASNode& as = get_or_build_node(asn, nodes_created);
@@ -114,7 +114,7 @@ void ASGraph::flatten_top_down(uint32_t& nodes_processed){
                 cus_node->increment_in_degree();
        
                 //false denotes flattening top down
-                if(prv_node->in_degree(false) == 0){
+                if(cus_node->in_degree(false) == 0){
        
                     if(flattened_.size() == rank+1) {
        
