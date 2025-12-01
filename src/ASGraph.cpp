@@ -6,6 +6,8 @@
 #include <sstream>
 #include <cstdint>
 #include <algorithm>
+#include <cctype> //for isdigit()
+#include <unordered_set>
 
 #include "ASGraph.h"
 
@@ -46,6 +48,100 @@ void ASGraph::try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money
 	}
 }
 
+const std::string input_clique_prefix = "# input clique:";
+
+void ASGraph::build_input_clique(const std::string& cur_line, uint32_t& nodes_created){
+    std::cout << "we are in here" << std::endl;
+    //std::string token;
+    std::string line = cur_line.substr(input_clique_prefix.size());
+    std::istringstream iss(line);
+    uint32_t asn;
+    while(iss >> asn){
+        //if(!isdigit(token[0])) {continue;}
+        //asn = std::stoi(token);
+        ASNode& as = get_or_build_node(asn, nodes_created);
+        flattened_[0].push_back(&as);
+    } 
+}
+
+void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){ 
+    std::cout << "flattening bottom-up" << std::endl;
+    //set rank 0 nodes
+    //ref to unique ptr in this case, kind of gross but whatever
+    //
+    //iterate through until
+    for(auto& pair : as_nodes_){
+        if(pair.second->num_customers() == 0){
+            flattened_[0].push_back(&(*pair.second));
+        }
+    }
+
+    //build out rank 0 first, then i can iterate all the way through one rank and move on to the next
+    for(int rank = 0; rank < flattened_.size(); rank++){
+        
+        for(int node = 0; node < flattened_[rank].size(); node++){
+       
+            //ASNode& node = get_node(flattened_[rank][i]);
+       
+            for(ASNode* prv_node : flattened_[rank][node]->providers()){
+       
+               // ASNode& prv_node = get_node(prv);
+       
+                prv_node->decrement_in_degree();
+       
+                if(prv_node->in_degree() == 0){
+       
+                    if(flattened_.size() == rank+1) {
+       
+                        flattened_.push_back(std::vector<ASNode*>());
+                    }
+       
+                    flattened_[rank+1].push_back(prv_node);
+                }
+            }
+       
+            nodes_processed++;
+        }
+    }
+}
+
+void ASGraph::flatten_top_down(uint32_t& nodes_processed){
+    std::cout << "flattening top-down" << std::endl;
+    
+    if (flattened_[0].empty()) return;
+
+    for(int rank = 0; rank < flattened_.size(); rank++){
+        
+        for(int node = 0; node < flattened_[rank].size(); node++){
+       
+            //ASNode& node = get_node(flattened_[rank][i]);
+       
+            for(ASNode* cus_node : flattened_[rank][node]->customers()){
+       
+               // ASNode& prv_node = get_node(prv);
+       
+                cus_node->decrement_in_degree();
+       
+                //false denotes flattening top down
+                if(cus_node->in_degree(false) == 0){
+       
+                    if(flattened_.size() == rank+1) {
+       
+                        flattened_.push_back(std::vector<ASNode*>());
+                    }
+       
+                    flattened_[rank+1].push_back(cus_node);
+                }
+            }
+       
+            nodes_processed++;
+        }
+    }
+
+    //reverse flattened_ since flattening top down
+    std::reverse(flattened_.begin(), flattened_.end());
+}
+
 int ASGraph::build_graph(const std::string& filepath){
 	std::fstream file(filepath, std::ios::in);
 
@@ -68,8 +164,15 @@ int ASGraph::build_graph(const std::string& filepath){
 	bool money_involved = false; // money involved = customer/provider, not = peers
 
 	while(std::getline(file, cur_line)){
-		//std::getline(file, cur_line);
-		if (cur_line.empty() || cur_line[0] == '#') {continue;}
+        
+		if (cur_line.empty() || cur_line[0] == '#') {      
+	        // input clique scenario
+            if(cur_line.rfind(input_clique_prefix, 0) == 0 && false){
+                build_input_clique(cur_line, nodes_created);
+            }
+            
+            continue;
+        }
 		
 		tokens.clear();
 		tokenize_line(cur_line, tokens);
@@ -88,50 +191,15 @@ int ASGraph::build_graph(const std::string& filepath){
 	}
 
     size_ = nodes_created;
-
-    //set rank 0 nodes
-    //ref to unique ptr in this case, kind of gross but whatever
-    //
-    //iterate through until
-    for(auto& pair : as_nodes_){
-        if(pair.second->num_customers() == 0){
-            flattened_[0].push_back(&(*pair.second));
-        }
-    }
-
+    
     uint32_t nodes_processed = 0;
     
-    //build out rank 1 first, then i can iterate all the way through one rank and move on to the next
-    for(int rank = 0; rank < flattened_.size(); rank++){
-        
-        for(int node = 0; node < flattened_[rank].size(); node++){
-       
-            //ASNode& node = get_node(flattened_[rank][i]);
-       
-            for(ASNode* prv_node : flattened_[rank][node]->providers()){
-       
-               // ASNode& prv_node = get_node(prv);
-       
-                prv_node->process_customer();
-       
-                if(prv_node->in_degree() == 0){
-       
-                    if(flattened_.size() == rank+1) {
-       
-                        flattened_.push_back(std::vector<ASNode*>());
-                    }
-       
-                    flattened_[rank+1].push_back(prv_node);
-                }
-            }
-       
-            nodes_processed++;
-        }
-    }
+    //if input clique was obtained, flatten top down, else bottom up
+    flattened_[0].size() > 0 ? flatten_top_down(nodes_processed) : flatten_bottom_up(nodes_processed);
 
     std::cout << "num ranks = " << flattened_.size() << std::endl;
 
-    //in other words if there is a cycle
+    //if there is a cycle error out
     if(nodes_processed < nodes_created){
         return 1;
     }

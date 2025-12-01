@@ -37,13 +37,17 @@ public:
     size_t num_customers() const{
         return customers_.size();
     }
-    uint32_t in_degree(){
-        return num_customers() - inverse_in_degree_;
+    size_t num_providers() const{
+        return providers_.size();
     }
-    void process_customer(){
+    uint32_t in_degree(bool bottom_up = true){
+        return (bottom_up ? num_customers() : num_providers()) - inverse_in_degree_;
+    }
+    void decrement_in_degree(){
         inverse_in_degree_++;
     }
     std::vector<ASNode*>& providers() {return providers_;} 
+    std::vector<ASNode*>& customers() {return customers_;}
 	friend std::ostream& operator<<(std::ostream& os, const ASNode& node){
 		os << "ASN of " << node.asn_;
 		os << "\nProviders: \n\t";
