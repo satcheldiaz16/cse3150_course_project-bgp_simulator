@@ -48,6 +48,7 @@ void ASGraph::try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money
 }
 
 void ASGraph::build_input_clique(std::string& cur_line, uint32_t& nodes_created){
+    std::cout << "we are in here" << std::endl;
     std::string token;
     std::stringstream ss(cur_line);
     uint32_t asn;
@@ -61,6 +62,7 @@ void ASGraph::build_input_clique(std::string& cur_line, uint32_t& nodes_created)
 }
 
 void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){ 
+    std::cout << "flattening bottom-up" << std::endl;
     //set rank 0 nodes
     //ref to unique ptr in this case, kind of gross but whatever
     //
@@ -101,6 +103,8 @@ void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){
 }
 
 void ASGraph::flatten_top_down(uint32_t& nodes_processed){
+    std::cout << "flattening top-down" << std::endl;
+
     for(int rank = 0; rank < flattened_.size(); rank++){
         
         for(int node = 0; node < flattened_[rank].size(); node++){
@@ -153,12 +157,14 @@ int ASGraph::build_graph(const std::string& filepath){
 	uint32_t right_asn = 0;
 	//ASNode& right_node;
 	bool money_involved = false; // money involved = customer/provider, not = peers
-    
-	while(std::getline(file, cur_line)){
+    const std::string input_clique_format = "# in";
 
+
+	while(std::getline(file, cur_line)){
+        
 		if (cur_line.empty() || cur_line[0] == '#') {      
 	        // input clique scenario
-            if(cur_line.substr(4) == "# in"){
+            if(cur_line.rfind(input_clique_format, 0) == 0){
                 build_input_clique(cur_line, nodes_created);
             }
             else { continue;}
