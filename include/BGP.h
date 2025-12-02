@@ -7,6 +7,7 @@
 
 #include "Announcement.h"
 #include "Policy.h"
+#include "ASNode.h"
 
 class BGP : public Policy{
     std::unordered_map<std::string, std::unique_ptr<Announcement>> local_rib_;

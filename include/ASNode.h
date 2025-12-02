@@ -4,6 +4,11 @@
 #include <vector>
 #include <algorithm>
 
+#include "ROV.h"
+#include "BGP.h"
+#include "Policy.h"
+#include "Announcement.h"
+
 class ASNode{
 	std::vector<ASNode*> providers_;
 	std::vector<ASNode*> customers_;

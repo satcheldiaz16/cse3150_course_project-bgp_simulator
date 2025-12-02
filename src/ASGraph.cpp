@@ -142,6 +142,12 @@ void ASGraph::flatten_top_down(uint32_t& nodes_processed){
     std::reverse(flattened_.begin(), flattened_.end());
 }
 
+void ASGraph::seed_announcement(uint32_t asn, std::string& prefix, bool rov_invalid){
+    ASNode* node = get_node(asn);
+    Announcement* ann = Announcement(prefix, node, rov_invalid);
+    node->policy()->recieve_announcement(ann, Relationship::ORIGIN);
+}
+
 int ASGraph::build_graph(const std::string& filepath){
 	std::fstream file(filepath, std::ios::in);
 
@@ -222,10 +228,14 @@ int ASGraph::propogate_announcements(){
             *node->announce_across();
         }
     }
-    for(auto& rank = flattened_.begin(); rank != flattened_.end(); rank++){
-        for(auto& node = *rank.begin(); node != *rank.end(); node++){
+    for(auto& rank = flattened_.rbegin(); rank != flattened_.rend(); rank++){
+        for(auto& node = *rank.rbegin(); node != *rank.rend(); node++){
             *node->announce_down();
         }
     }
+    return 0;
+}
+
+int output_graph(){
     return 0;
 }

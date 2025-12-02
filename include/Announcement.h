@@ -3,18 +3,7 @@
 #include <string>
 
 #include "ASNode.h"
-
-enum class Relationship{
-    ORIGIN,
-    CUSTOMER,
-    PEER,
-    PROVIDER
-};
-
-struct RecievedAnnouncement{
-    Announcement* announcement;
-    Relationship relationship;
-};
+#include "Relationship.h"
 
 class Announcement {
 public:
