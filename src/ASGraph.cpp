@@ -206,3 +206,26 @@ int ASGraph::build_graph(const std::string& filepath){
 
 	return 0;
 }
+
+int ASGraph::seed_announcements(const std::string& filepath){
+    return 0;
+}
+
+int ASGraph::propogate_announcements(){
+    for(auto& rank = flattened_.begin(); rank != flattened_.end(); rank++){
+        for(auto& node = *rank.begin(); node != *rank.end(); node++){
+            *node->announce_up();    
+        }
+    }
+    for(auto& rank = flattened_.begin(); rank != flattened_.end(); rank++){
+        for(auto& node = *rank.begin(); node != *rank.end(); node++){
+            *node->announce_across();
+        }
+    }
+    for(auto& rank = flattened_.begin(); rank != flattened_.end(); rank++){
+        for(auto& node = *rank.begin(); node != *rank.end(); node++){
+            *node->announce_down();
+        }
+    }
+    return 0;
+}

@@ -30,7 +30,7 @@ public:
 	//1 byte
 	Relationship relationship; // 0 for origin, 1 for customer, 2 for peer, 3 for provider
 	//4 bytes
-	uint32_t next_hop_asn;
+	//uint32_t next_hop_asn;
     bool rov_invalid;
 	//size of this will be large
 	// 53 - 56 bytes
@@ -41,7 +41,7 @@ public:
         prefix = pref;
         host = ho;
         relationship = Relationship::ORIGIN;
-        next_hop_asn = host->asn();
+        //next_hop_asn = host->asn();
         rov_invalid = rov_inv;
     }
     Announcement(const Announcement& other, Relationship r, ASNode* ho = nullptr){
@@ -49,12 +49,17 @@ public:
         host = ho;
         relationship = r;
         prev = *other;
-        next_hop_asn = prev->host->asn();
+        //next_hop_asn = prev->host->asn();
         rov_invalid = other.rov_invalid;
     }
     Announcement& operator=(const Announcement& other) = delete;
     Announcement(Announcement&& other) = delete;
     Announcement& operator=(Announcement&& other) = delete;
+    uint32_t next_hop_asn(){
+        if(prev == nullptr) return host->asn();
+
+        return prev->host->asn();
+    }
     //implement later
     void path(){
         return prev->path();

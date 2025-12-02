@@ -55,6 +55,12 @@ public:
 	}
 
 	int build_graph(const std::string& filepath);
+
+    int seed_announcements(const std::string& filepath);
+
+    int propogate_announcements();
+
+    int output_graph();
 	
 	friend std::ostream& operator<<(std::ostream& os, const ASGraph& graph) {
 		os << "Graph\n";

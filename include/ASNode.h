@@ -16,6 +16,11 @@ class ASNode{
 			relationships.push_back(asn);
 		}
 	}
+    void announce(std::vector<ASNode*>& listeners, Relationship r){
+        policy_->process_announcements(&this);
+
+        policy_->send_announcements(listeners, r);
+    }
 public:
 	ASNode() {}
 	ASNode(uint32_t asn, bool use_rov = false) {
@@ -52,6 +57,15 @@ public:
     std::vector<ASNode*>& providers() {return providers_;} 
     std::vector<ASNode*>& customers() {return customers_;}
     Policy* policy() { return policy_.get(); }
+    void announce_up(){
+        announce(providers_, Relationship::PROVIDER);
+    }
+    void announce_across(){
+        announce(peers_, Relationship::PEER);
+    }
+    void announce_down(){
+        announce(customers_, Relationship::CUSTOMER);
+    }
 	friend std::ostream& operator<<(std::ostream& os, const ASNode& node){
 		os << "ASN of " << node.asn_;
 		os << "\nProviders: \n\t";

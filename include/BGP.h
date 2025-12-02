@@ -30,6 +30,8 @@ public:
                 }); 
             }
         }
+
+        recieved_queue_.clear();
     }
     void send_announcements(std::vector<ASNode*> recipients, Relationship r) final override {
        for(auto& pair : local_rib_){
