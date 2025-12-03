@@ -262,16 +262,28 @@ int ASGraph::seed_announcements(const std::string& filepath){
 
 int ASGraph::propogate_announcements(){
     for(auto rank = flattened_.begin(); rank != flattened_.end(); rank++){
+       
+        for(auto node = rank->begin(); node != rank->end(); node++){
+            (*node)->policy()->process_announcements(*node);    
+        }
         for(auto node = rank->begin(); node != rank->end(); node++){
             (*node)->announce_up();    
         }
     }
     for(auto rank = flattened_.begin(); rank != flattened_.end(); rank++){
+        
+        for(auto node = rank->begin(); node != rank->end(); node++){
+            (*node)->policy()->process_announcements(*node);    
+        }
         for(auto node = rank->begin(); node != rank->end(); node++){
             (*node)->announce_across();
         }
     }
     for(auto rank = flattened_.rbegin(); rank != flattened_.rend(); rank++){
+        
+        for(auto node = rank->rbegin(); node != rank->rend(); node++){
+            (*node)->policy()->process_announcements(*node);    
+        }
         for(auto node = rank->rbegin(); node != rank->rend(); node++){
             (*node)->announce_down();
         }

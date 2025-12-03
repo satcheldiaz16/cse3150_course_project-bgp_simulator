@@ -13,7 +13,7 @@ void ASNode::try_add_node(ASNode* asn, std::vector<ASNode*>& relationships){
      }
 }
 void ASNode::announce(std::vector<ASNode*>& listeners, Relationship r){
-    policy_->process_announcements(this);
+//    policy_->process_announcements(this);
 
     policy_->send_announcements(listeners, r);
 }
@@ -47,13 +47,13 @@ std::vector<ASNode*>& ASNode::providers() {return providers_;}
 std::vector<ASNode*>& ASNode::customers() {return customers_;}
 Policy* ASNode::policy() { return policy_.get(); }
 void ASNode::announce_up(){
-    announce(providers_, Relationship::PROVIDER);
+    announce(providers_, Relationship::CUSTOMER);
 }
 void ASNode::announce_across(){
     announce(peers_, Relationship::PEER);
 }
 void ASNode::announce_down(){
-    announce(customers_, Relationship::CUSTOMER);
+    announce(customers_, Relationship::PROVIDER);
 }
 std::ostream& operator<<(std::ostream& os, const ASNode& node){
     os << "ASN of " << node.asn_;

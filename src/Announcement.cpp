@@ -24,6 +24,11 @@ uint32_t Announcement::next_hop_asn() const{
 
     return prev->host->asn();
 }
+std::string Announcement::path() const{
+    if(prev == nullptr) return std::to_string(host->asn());
+    return std::to_string(host->asn()) + ", " + prev->path(); 
+}
+/*
 std::vector<uint32_t> Announcement::path() const{
     std::vector<uint32_t> vec = prev == nullptr ? std::vector<uint32_t>() : prev->path();
     
@@ -31,8 +36,10 @@ std::vector<uint32_t> Announcement::path() const{
     
     return std::move(vec);
 }
-
+*/
 const std::string Announcement::format_path(){
+    return "(" + path() + ")";
+/*
     std::string str_path = "(";
     std::vector<uint32_t> vec_path = path();
 
@@ -46,7 +53,8 @@ const std::string Announcement::format_path(){
 
     str_path += ")";
 
-    return std::move(str_path);
+
+    return std::move(str_path);*/
 }/*
 bool Announcement::operator<(const Announcement& other) const{
     if(relationship != other.relationship) { return relationship < other.relationship; }
