@@ -6,6 +6,7 @@
 #include <memory>
 #include<vector>
 
+#include "ROV.h"
 #include "ASNode.h"
 
 class ASGraph{
@@ -19,6 +20,7 @@ class ASGraph{
     void build_input_clique(const std::string& cur_line, uint32_t& nodes_created);
     void flatten_bottom_up(uint32_t& nodes_processed);
     void flatten_top_down(uint32_t& nodes_processed);
+    void seed_announcement(uint32_t asn, std::string& prefix, bool rov_invalid);
 public:
 	ASGraph(){
         flattened_.push_back(std::vector<ASNode*>());
@@ -55,6 +57,12 @@ public:
 	}
 
 	int build_graph(const std::string& filepath);
+
+    int seed_announcements(const std::string& filepath);
+
+    int propogate_announcements();
+
+    int output_graph();
 	
 	friend std::ostream& operator<<(std::ostream& os, const ASGraph& graph) {
 		os << "Graph\n";

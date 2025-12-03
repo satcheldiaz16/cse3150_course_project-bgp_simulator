@@ -8,6 +8,11 @@ include_directories(include)
 
 set(SOURCE_FILES
 	src/ASGraph.cpp
+    src/Policy.cpp
+    src/Announcement.cpp
+    src/BGP.cpp
+    src/ROV.cpp
+    src/ASNode.cpp
 )
 
 add_executable(bgp_sim src/main.cpp ${SOURCE_FILES})
