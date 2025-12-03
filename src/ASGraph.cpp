@@ -144,8 +144,25 @@ void ASGraph::flatten_top_down(uint32_t& nodes_processed){
 
 void ASGraph::seed_announcement(uint32_t asn, std::string& prefix, bool rov_invalid){
     ASNode* node = &get_node(asn);
-    Announcement ann = Announcement(prefix, node, rov_invalid);
-    node->policy()->recieve_announcement(&ann, Relationship::ORIGIN);
+    
+    node->policy()->seed_announcement(prefix, node, rov_invalid);
+}
+
+int ASGraph::build_rov_invalid_list(const std::string& filepath){
+    std::fstream file(filepath, std::ios::in);
+    
+    if(!file.is_open()){
+        std::cerr << "Error: Unable to open rov invalid file" << std::endl;
+        return 1;
+    }
+
+    std::string cur_line;
+
+    while(std::getline(file, cur_line)){
+        rov_invalid_.push_back(std::stoi(cur_line));
+    }     
+
+    return 0;
 }
 
 int ASGraph::build_graph(const std::string& filepath){
@@ -222,6 +239,8 @@ int ASGraph::seed_announcements(const std::string& filepath){
     }
     
     std::string line;
+    
+    std::getline(file, line);
 
     while(std::getline(file, line)){
         std::stringstream ss(line);
@@ -243,23 +262,55 @@ int ASGraph::seed_announcements(const std::string& filepath){
 
 int ASGraph::propogate_announcements(){
     for(auto rank = flattened_.begin(); rank != flattened_.end(); rank++){
-        for(auto node = *rank->begin(); node != *rank->end(); node++){
-            (*node).announce_up();    
+       
+        for(auto node = rank->begin(); node != rank->end(); node++){
+            (*node)->policy()->process_announcements(*node);    
+        }
+        for(auto node = rank->begin(); node != rank->end(); node++){
+            (*node)->announce_up();    
         }
     }
     for(auto rank = flattened_.begin(); rank != flattened_.end(); rank++){
-        for(auto node = *rank->begin(); node != *rank->end(); node++){
-            (*node).announce_across();
+        
+        for(auto node = rank->begin(); node != rank->end(); node++){
+            (*node)->policy()->process_announcements(*node);    
+        }
+        for(auto node = rank->begin(); node != rank->end(); node++){
+            (*node)->announce_across();
         }
     }
     for(auto rank = flattened_.rbegin(); rank != flattened_.rend(); rank++){
-        for(auto node = *rank->rbegin(); node != *rank->rend(); node++){
-            (*node).announce_down();
+        
+        for(auto node = rank->rbegin(); node != rank->rend(); node++){
+            (*node)->policy()->process_announcements(*node);    
+        }
+        for(auto node = rank->rbegin(); node != rank->rend(); node++){
+            (*node)->announce_down();
         }
     }
     return 0;
 }
 
-int output_graph(){
+int ASGraph::output_graph(const std::string& filepath){
+    std::ofstream output_file(filepath);
+
+    if(!output_file.is_open()){
+        std::cerr << "Couldn't open output file" << std::endl;
+        return 1;
+    }
+
+    output_file << "asn,prefix,as_path\n";
+
+
+    for(auto& node_pair : as_nodes_){
+        for(auto& rib_entry : node_pair.second->policy()->get_rib()){
+            output_file << node_pair.first << ","
+                << rib_entry.first << ",\""
+                << rib_entry.second->format_path() << "\"\n";
+        }
+    }
+
+    output_file.close();
+
     return 0;
 }

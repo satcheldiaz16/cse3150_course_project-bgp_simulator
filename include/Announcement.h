@@ -8,7 +8,7 @@ class ASNode;
 
 class Announcement {
 public:
-	uint32_t prefix_id; //can store our prefixes in a hashmap elsewhere
+	uint32_t path_size = 1; //can store our prefixes in a hashmap elsewhere
 	//24 bytes
 	std::string prefix; // 1.2.0.0/16 or some IPv6 prefix
 	//uint32_t start_index;
@@ -27,12 +27,15 @@ public:
 	// all of these things will be moved to an 8 byte boundary
     Announcement() = delete;
     //this should only ever be called when seeding
-    Announcement(std::string& pref, ASNode* ho, bool rov_inv);
+    Announcement(const std::string& pref, ASNode* ho, bool rov_inv);
     Announcement(const Announcement& other, Relationship r, ASNode* ho = nullptr, Announcement* p = nullptr);
     Announcement& operator=(const Announcement& other) = delete;
     Announcement(Announcement&& other) = delete;
     Announcement& operator=(Announcement&& other) = delete;
-    uint32_t next_hop_asn();
+    uint32_t next_hop_asn() const;
     //implement later
-    void path();
+    std::string path() const;
+    //    std::vector<uint32_t> path() const;
+    const std::string format_path();
+//    bool operator<(const Announcement& other) const;
 };
