@@ -277,7 +277,7 @@ int ASGraph::propogate_announcements(){
     return 0;
 }
 
-int output_graph(const std::string& filepath){
+int ASGraph::output_graph(const std::string& filepath){
     std::ofstream output_file(filepath);
 
     if(!output_file.is_open()){

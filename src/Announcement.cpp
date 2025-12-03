@@ -27,24 +27,24 @@ uint32_t Announcement::next_hop_asn(){
 std::vector<uint32_t> Announcement::path(){
     std::vector<uint32_t> vec = prev == nullptr ? std::vector<uint32_t>() : prev->path();
     
-    vec.push_back(ho->asn());
+    vec.push_back(host->asn());
     
     return std::move(vec);
 }
 
 const std::string& Announcement::format_path(){
-    std::string path = "(";
-    std::vector<uint32_t> path = path();
+    std::string str_path = "(";
+    std::vector<uint32_t> vec_path = path();
 
-    for(int i = 0; i < path.size(); i++){
-        path += std::to_string(path[i]);
+    for(int i = 0; i < vec_path.size(); i++){
+        str_path += std::to_string(vec_path[i]);
         
-        if (i != path.size()-1){
-            path += ", ";
+        if (i != vec_path.size()-1){
+            str_path += ", ";
         }
     }
 
-    path += ")";
+    str_path += ")";
 
-    return path;
+    return str_path;
 }
