@@ -32,8 +32,9 @@ public:
     Announcement& operator=(const Announcement& other) = delete;
     Announcement(Announcement&& other) = delete;
     Announcement& operator=(Announcement&& other) = delete;
-    uint32_t next_hop_asn();
+    uint32_t next_hop_asn() const;
     //implement later
-    std::vector<uint32_t> path();
-    const std::string& format_path();
+    std::vector<uint32_t> path() const;
+    const std::string format_path();
+//    bool operator<(const Announcement& other) const;
 };

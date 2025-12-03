@@ -12,7 +12,7 @@ class ASNode;//#include "ASNode.h"
 
 class BGP : public Policy{
     std::unordered_map<std::string, std::unique_ptr<Announcement>> local_rib_;
-    std::unordered_map<std::string, RecievedAnnouncement> recieved_queue_;
+    std::unordered_map<std::string, std::vector<RecievedAnnouncement>> recieved_queue_;
 public:
     virtual void recieve_announcement(Announcement* ann, Relationship r) override;
     void process_announcements(ASNode* host) final override;        

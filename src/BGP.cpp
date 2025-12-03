@@ -11,23 +11,24 @@
 #include "ASNode.h"
 
 void BGP::recieve_announcement(Announcement* ann, Relationship r){
-    recieved_queue_[ann->prefix] = RecievedAnnouncement(ann, r);
+    recieved_queue_[ann->prefix].push_back(RecievedAnnouncement(ann, r));
 }
 void BGP::process_announcements(ASNode* host){
     for(auto& pair : recieved_queue_){
-        bool conflicts = false; //implement this later
-        
-        if(!conflicts){
-            local_rib_.insert({
-                pair.first,
-                std::make_unique<Announcement>(
-                    *pair.second.announcement,
-                    pair.second.relationship,
-                    host,
-                    pair.second.announcement
-                )
-            }); 
+        std::vector<RecievedAnnouncement>& bucket = pair.second;
+        while(bucket.size() > 1){
+            bucket[0] < bucket[1] ? bucket.erase(bucket.begin()+1) : bucket.erase(bucket.begin());
         }
+
+        local_rib_.insert({
+            pair.first,
+            std::make_unique<Announcement>(
+                *pair.second[0].announcement,
+                pair.second[0].relationship,
+                host,
+                pair.second[0].announcement
+            )
+        }); 
     }
 
     recieved_queue_.clear();

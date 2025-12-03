@@ -18,13 +18,12 @@ Announcement::Announcement(const Announcement& other, Relationship r, ASNode* ho
     //next_hop_asn = prev->host->asn();
     rov_invalid = other.rov_invalid;
 }
-uint32_t Announcement::next_hop_asn(){
+uint32_t Announcement::next_hop_asn() const{
     if(prev == nullptr) return host->asn();
 
     return prev->host->asn();
 }
-//implement later
-std::vector<uint32_t> Announcement::path(){
+std::vector<uint32_t> Announcement::path() const{
     std::vector<uint32_t> vec = prev == nullptr ? std::vector<uint32_t>() : prev->path();
     
     vec.push_back(host->asn());
@@ -32,7 +31,7 @@ std::vector<uint32_t> Announcement::path(){
     return std::move(vec);
 }
 
-const std::string& Announcement::format_path(){
+const std::string Announcement::format_path(){
     std::string str_path = "(";
     std::vector<uint32_t> vec_path = path();
 
@@ -46,5 +45,14 @@ const std::string& Announcement::format_path(){
 
     str_path += ")";
 
-    return str_path;
-}
+    return std::move(str_path);
+}/*
+bool Announcement::operator<(const Announcement& other) const{
+    if(relationship != other.relationship) { return relationship < other.relationship; }
+
+    size_t this_path_length = path().size();
+    size_t other_path_length = path().size();
+    if (this_path_length != other_path_length) { return this_path_length < other_path_length; }
+
+    return next_hop_asn() < other.next_hop_asn();
+}*/
