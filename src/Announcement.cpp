@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 
 #include "Announcement.h"
 #include "ASNode.h"
@@ -23,6 +24,27 @@ uint32_t Announcement::next_hop_asn(){
     return prev->host->asn();
 }
 //implement later
-void Announcement::path(){
-    return prev->path();
+std::vector<uint32_t> Announcement::path(){
+    std::vector<uint32_t> vec = prev == nullptr ? std::vector<uint32_t>() : prev->path();
+    
+    vec.push_back(ho->asn());
+    
+    return std::move(vec);
+}
+
+const std::string& Announcement::format_path(){
+    std::string path = "(";
+    std::vector<uint32_t> path = path();
+
+    for(int i = 0; i < path.size(); i++){
+        path += std::to_string(path[i]);
+        
+        if (i != path.size()-1){
+            path += ", ";
+        }
+    }
+
+    path += ")";
+
+    return path;
 }

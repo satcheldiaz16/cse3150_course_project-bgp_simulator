@@ -1,8 +1,9 @@
 #pragma once
 
-//#include <unordered_map>
+#include <unordered_map>
 #include <memory>
 #include <vector>
+#include <string>
 
 class ASNode;//#include "ASNode.h"
 class Announcement;//#include "Announcement.h"
@@ -14,5 +15,6 @@ public:
     virtual void recieve_announcement(Announcement* ann, Relationship r) = 0;
     virtual void process_announcements(ASNode* host) = 0;
     virtual void send_announcements(std::vector<ASNode*> recipients, Relationship r) = 0;
+    virtual const std::unordered_map<std::string, std::unique_ptr<Announcement>>& get_rib() const = 0;
     virtual ~Policy() {}
 };

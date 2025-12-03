@@ -39,3 +39,6 @@ void BGP::send_announcements(std::vector<ASNode*> recipients, Relationship r){
        }
    }
 }
+const std::unordered_map<std::string, std::unique_ptr<Announcement>>& BGP::get_rib() const {
+    return local_rib_;
+}

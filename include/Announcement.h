@@ -34,5 +34,6 @@ public:
     Announcement& operator=(Announcement&& other) = delete;
     uint32_t next_hop_asn();
     //implement later
-    void path();
+    std::vector<uint32_t> path();
+    const std::string& format_path();
 };

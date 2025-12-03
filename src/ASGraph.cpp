@@ -148,6 +148,23 @@ void ASGraph::seed_announcement(uint32_t asn, std::string& prefix, bool rov_inva
     node->policy()->recieve_announcement(&ann, Relationship::ORIGIN);
 }
 
+int ASGraph::build_rov_invalid_list(const std::string& filepath){
+    std::fstream file(filepath, std::ios::in);
+    
+    if(!file.is_open()){
+        std::cerr << "Error: Unable to open rov invalid file" << std::endl;
+        return 1;
+    }
+
+    std::string cur_line;
+
+    while(std::getline(file, cur_line)){
+        rov_invalid_.push_back(std::stoi(cur_line));
+    }     
+
+    return 0;
+}
+
 int ASGraph::build_graph(const std::string& filepath){
 	std::fstream file(filepath, std::ios::in);
 
@@ -260,6 +277,25 @@ int ASGraph::propogate_announcements(){
     return 0;
 }
 
-int output_graph(){
+int output_graph(const std::string& filepath){
+    std::ofstream output_file(filepath);
+
+    if(!output_file.is_open()){
+        std::cerr << "Couldn't open output file" << std::endl;
+        return 1;
+    }
+
+    output_file << "asn,prefix,as_path\n";
+
+    for(auto& node_pair : as_nodes_){
+        for(auto& rib_entry : node_pair.second->policy()->get_rib()){
+            output_file << node_pair.first << ","
+                << rib_entry.first << ","
+                << rib_entry.second->format_path() << "\n";
+        }
+    }
+
+    output_file.close();
+
     return 0;
 }

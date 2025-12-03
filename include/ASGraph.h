@@ -4,7 +4,8 @@
 #include <unordered_map>
 #include <iostream>
 #include <memory>
-#include<vector>
+#include <vector>
+#include <algorithm>
 
 #include "ROV.h"
 #include "ASNode.h"
@@ -12,6 +13,7 @@
 class ASGraph{
     std::vector<std::vector<ASNode*>> flattened_;
 	std::unordered_map<uint32_t, std::unique_ptr<ASNode>> as_nodes_;
+    std::vector<uint32_t> rov_invalid_;
 	uint32_t size_; //estimate size prior to parsing data, when done confirm the size and release any unused memory, or perhaps check the back of the file for the last asn
 	//std::vector<ASNode> as_nodes_;
 	void tokenize_line(const std::string& line, std::vector<std::string>& vec);
@@ -50,11 +52,15 @@ public:
 	}
 	~ASGraph() {}
 	void insert_node_at(uint32_t asn){
-		as_nodes_.emplace(asn, std::make_unique<ASNode>(asn));
+		as_nodes_.emplace(asn, std::make_unique<ASNode>(asn, 
+            std::find(rov_invalid_.begin(), rov_invalid_.end(), asn) != rov_invalid_.end()
+        ));
 	}
 	uint32_t& size() {
 		return size_;
 	}
+
+    int build_rov_invalid_list(const std::string& filepath);    
 
 	int build_graph(const std::string& filepath);
 
@@ -62,7 +68,7 @@ public:
 
     int propogate_announcements();
 
-    int output_graph();
+    int output_graph(const std::string& filepath);
 	
 	friend std::ostream& operator<<(std::ostream& os, const ASGraph& graph) {
 		os << "Graph\n";
