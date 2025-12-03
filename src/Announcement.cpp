@@ -4,7 +4,7 @@
 #include "Announcement.h"
 #include "ASNode.h"
 #include "Relationship.h"
-Announcement::Announcement(std::string& pref, ASNode* ho, bool rov_inv){
+Announcement::Announcement(const std::string& pref, ASNode* ho, bool rov_inv){
     prefix = pref;
     host = ho;
     relationship = Relationship::ORIGIN;
@@ -12,6 +12,7 @@ Announcement::Announcement(std::string& pref, ASNode* ho, bool rov_inv){
 }
 Announcement::Announcement(const Announcement& other, Relationship r, ASNode* ho, Announcement* p){
     prefix = other.prefix;
+    path_size = other.path_size + 1;
     host = ho;
     relationship = r;
     prev = p;

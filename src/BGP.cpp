@@ -13,6 +13,16 @@
 void BGP::recieve_announcement(Announcement* ann, Relationship r){
     recieved_queue_[ann->prefix].push_back(RecievedAnnouncement(ann, r));
 }
+void BGP::seed_announcement(const std::string& prefix, ASNode* host, bool rov_invalid){
+    local_rib_.insert({
+            prefix,
+            std::make_unique<Announcement>(
+                    prefix,
+                    host,
+                    rov_invalid
+            )
+    });
+}
 void BGP::process_announcements(ASNode* host){
     for(auto& pair : recieved_queue_){
         std::vector<RecievedAnnouncement>& bucket = pair.second;
