@@ -218,6 +218,7 @@ int ASGraph::seed_announcements(const std::string& filepath){
 
     if(!file.is_open()){
         std::cerr << "Error reading seeded announcements" << std::endl;
+        return 1;
     }
     
     std::string line;
