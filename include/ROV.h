@@ -1,13 +1,8 @@
 #pragma once
 
-
 #include "BGP.h"
 
-class ROV final: public BGP{
+class ROV : public BGP {
 public:
-    void recieve_announcement(Announcement* ann) final override {
-        if(ann.rov_invalid) { return; }
-
-        BGP::recieve_announcement(ann);
-    }
+    void recieve_announcement(Announcement* ann, Relationship r) final override;
 };

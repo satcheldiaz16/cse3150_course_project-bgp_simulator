@@ -6,6 +6,7 @@
 #include <memory>
 #include<vector>
 
+#include "ROV.h"
 #include "ASNode.h"
 
 class ASGraph{

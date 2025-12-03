@@ -3,7 +3,11 @@
 #include "Announcement.h"
 #include "Relationship.h"
 
-struct RecievedAnnouncement{
+class RecievedAnnouncement{
+public:
     Announcement* announcement;
-    Relationship relationship;
+    Relationship relationship; 
+    RecievedAnnouncement(){}
+    RecievedAnnouncement(Announcement* a, Relationship r) : announcement(a), relationship(r) {};
+    ~RecievedAnnouncement() = default;
 };

@@ -143,9 +143,9 @@ void ASGraph::flatten_top_down(uint32_t& nodes_processed){
 }
 
 void ASGraph::seed_announcement(uint32_t asn, std::string& prefix, bool rov_invalid){
-    ASNode* node = get_node(asn);
-    Announcement* ann = Announcement(prefix, node, rov_invalid);
-    node->policy()->recieve_announcement(ann, Relationship::ORIGIN);
+    ASNode* node = &get_node(asn);
+    Announcement ann = Announcement(prefix, node, rov_invalid);
+    node->policy()->recieve_announcement(&ann, Relationship::ORIGIN);
 }
 
 int ASGraph::build_graph(const std::string& filepath){
@@ -214,23 +214,46 @@ int ASGraph::build_graph(const std::string& filepath){
 }
 
 int ASGraph::seed_announcements(const std::string& filepath){
+    std::ifstream file(filepath);
+
+    if(!file.is_open()){
+        std::cerr << "Error reading seeded announcements" << std::endl;
+    }
+    
+    std::string line;
+
+    while(std::getline(file, line)){
+        std::stringstream ss(line);
+        std::string cell;
+        std::vector<std::string> row_data;
+
+        while(std::getline(ss, cell, ',')){
+            row_data.push_back(cell);
+        }
+        
+        bool b;
+        std::istringstream(row_data[2]) >> std::boolalpha >> b;
+
+        seed_announcement(std::stoi(row_data[0]), row_data[1], b);
+    }
+
     return 0;
 }
 
 int ASGraph::propogate_announcements(){
-    for(auto& rank = flattened_.begin(); rank != flattened_.end(); rank++){
-        for(auto& node = *rank.begin(); node != *rank.end(); node++){
-            *node->announce_up();    
+    for(auto rank = flattened_.begin(); rank != flattened_.end(); rank++){
+        for(auto node = *rank->begin(); node != *rank->end(); node++){
+            (*node).announce_up();    
         }
     }
-    for(auto& rank = flattened_.begin(); rank != flattened_.end(); rank++){
-        for(auto& node = *rank.begin(); node != *rank.end(); node++){
-            *node->announce_across();
+    for(auto rank = flattened_.begin(); rank != flattened_.end(); rank++){
+        for(auto node = *rank->begin(); node != *rank->end(); node++){
+            (*node).announce_across();
         }
     }
-    for(auto& rank = flattened_.rbegin(); rank != flattened_.rend(); rank++){
-        for(auto& node = *rank.rbegin(); node != *rank.rend(); node++){
-            *node->announce_down();
+    for(auto rank = flattened_.rbegin(); rank != flattened_.rend(); rank++){
+        for(auto node = *rank->rbegin(); node != *rank->rend(); node++){
+            (*node).announce_down();
         }
     }
     return 0;

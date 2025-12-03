@@ -2,7 +2,8 @@
 
 #include <string>
 
-#include "ASNode.h"
+//#include "ASNode.h"
+class ASNode;
 #include "Relationship.h"
 
 class Announcement {
@@ -26,31 +27,12 @@ public:
 	// all of these things will be moved to an 8 byte boundary
     Announcement() = delete;
     //this should only ever be called when seeding
-    Announcement(std::string& pref, ASNode* ho, bool rov_inv){
-        prefix = pref;
-        host = ho;
-        relationship = Relationship::ORIGIN;
-        //next_hop_asn = host->asn();
-        rov_invalid = rov_inv;
-    }
-    Announcement(const Announcement& other, Relationship r, ASNode* ho = nullptr){
-        prefix = other.prefix;
-        host = ho;
-        relationship = r;
-        prev = *other;
-        //next_hop_asn = prev->host->asn();
-        rov_invalid = other.rov_invalid;
-    }
+    Announcement(std::string& pref, ASNode* ho, bool rov_inv);
+    Announcement(const Announcement& other, Relationship r, ASNode* ho = nullptr, Announcement* p = nullptr);
     Announcement& operator=(const Announcement& other) = delete;
     Announcement(Announcement&& other) = delete;
     Announcement& operator=(Announcement&& other) = delete;
-    uint32_t next_hop_asn(){
-        if(prev == nullptr) return host->asn();
-
-        return prev->host->asn();
-    }
+    uint32_t next_hop_asn();
     //implement later
-    void path(){
-        return prev->path();
-    }
+    void path();
 };
