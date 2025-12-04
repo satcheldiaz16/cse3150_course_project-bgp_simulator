@@ -15,7 +15,7 @@ set(SOURCE_FILES
     src/ASNode.cpp
 )
 
-add_executable(bgp_sim src/main.cpp ${SOURCE_FILES})
+add_executable(bgp_simulator src/main.cpp ${SOURCE_FILES})
 
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})

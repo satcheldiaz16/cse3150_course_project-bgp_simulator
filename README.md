@@ -1,5 +1,7 @@
 # cse3150_course_project
 
+run program format: ./bgp_simulator --relationships ../bench/many/CAIDAASGraphCollector_2025.10.16.txt --announcements ../bench/many/anns.csv --rov-asns ../bench/many/rov_asns.csv
+
 caida link: https://publicdata.caida.org/datasets/as-relationships/serial-2/
 
 My ASGraph is structured as an std::unordered_map k:uint32_t v:unique_ptr to ASNode
