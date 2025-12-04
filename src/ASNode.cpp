@@ -20,6 +20,7 @@ void ASNode::announce(std::vector<ASNode*>& listeners, Relationship r){
 ASNode::ASNode(uint32_t asn, bool use_rov) {
     asn_ = asn;
     policy_ = use_rov ? std::make_unique<ROV>() : std::make_unique<BGP>();
+    inverse_in_degree_ = 0;
 }
 uint32_t& ASNode::asn(){ return asn_; }
 void ASNode::try_add_prv(ASNode* prv){

@@ -17,6 +17,7 @@ class ASNode{
 	void try_add_node(ASNode* asn, std::vector<ASNode*>& relationships);
     void announce(std::vector<ASNode*>& listeners, Relationship r);
 public:
+    int32_t remaining_degree_ = 0;
 	ASNode() {}
 	ASNode(uint32_t asn, bool use_rov = false);
 	ASNode(const ASNode& other) = delete;

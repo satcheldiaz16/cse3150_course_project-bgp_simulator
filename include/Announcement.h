@@ -14,7 +14,9 @@ public:
 	//uint32_t start_index;
 	//uint32_t end_index;
     ASNode* host;
-    Announcement* prev = nullptr; //nullptr denotes origin of path 
+    std::vector<uint32_t> path;
+    uint32_t next_hop_as;
+//Announcement* prev = nullptr; //nullptr denotes origin of path 
 	//24 bytes
 	//std::vector<uint32_t> as_path;
 	//1 byte
@@ -28,14 +30,14 @@ public:
     Announcement() = delete;
     //this should only ever be called when seeding
     Announcement(const std::string& pref, ASNode* ho, bool rov_inv);
-    Announcement(const Announcement& other, Relationship r, ASNode* ho = nullptr, Announcement* p = nullptr);
+    Announcement(const Announcement& other, Relationship r, ASNode* ho = nullptr);
     Announcement& operator=(const Announcement& other) = delete;
     Announcement(Announcement&& other) = delete;
     Announcement& operator=(Announcement&& other) = delete;
     uint32_t next_hop_asn() const;
     //implement later
-    std::string path() const;
+   // std::string path() const;
     //    std::vector<uint32_t> path() const;
     const std::string format_path();
-//    bool operator<(const Announcement& other) const;
+    bool operator<(const Announcement& other) const;
 };

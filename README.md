@@ -1,6 +1,10 @@
 # cse3150_course_project
 
+run program format: ./bgp_simulator --relationships ../bench/many/CAIDAASGraphCollector_2025.10.16.txt --announcements ../bench/many/anns.csv --rov-asns ../bench/many/rov_asns.csv
+
 caida link: https://publicdata.caida.org/datasets/as-relationships/serial-2/
+
+Runtime: ~30s on my machine. Not super happy with this, I ran into much, much difficulty in the last 3rd of the project with the structure of my announcements and seg faults, due to time constraints I fell back on using shared_ptrs for them, which def hurt performance. I made two crucial errors in working on this project: I waited too long to start, and tried implementing an optimized version from the start rather than building a working, slow version before optimizing. Going forward I will try to avoid decisions like both of these.
 
 My ASGraph is structured as an std::unordered_map k:uint32_t v:unique_ptr to ASNode
 
@@ -15,5 +19,5 @@ When doing research into how to check for cycles, I noticed that the cycle check
 
 I've decided not to go for this, but I will leave the implementation in my code, and this documentation here just for history's sake. Starting top-down would only save me one o(V) pass, not super helpful and was producing incorrect results. - After closer inspection of the CAIDA file, I discovered the input clique info at the top of it, which according to a google search is the top most rank of the flattened graph. I can use this information to flatten the graph in reverse, and then reverse my vec of vec, which is O(67), as opposed to cycling through the graph to figure out my rank[0] layer, O(80000+). Small optimization but still.
 
-Announcement Paths: after thinking hard on it, I don't really see how arena pattern works with diverging paths. I've decided to go with this strategy: each announcement will store a Pointer to the ASNode it currently resides at, as well as a pointer to where it just came from. The origin announcement will just store a nullptr for where it came from, this will denote it as the origin. For reading the entire path, I'll build out a recursive method that backtracks through the pointer connections. Announcements will be memory safe with the same observer pattern I used for the graph itself; a Nodes local rib store a unique ptr to the location of the announcement, and all other pointers will be observers of this original unique ptr.
+This didn't end up coming to fruition either, ran into many seg fault issues - Announcement Paths: after thinking hard on it, I don't really see how arena pattern works with diverging paths. I've decided to go with this strategy: each announcement will store a Pointer to the ASNode it currently resides at, as well as a pointer to where it just came from. The origin announcement will just store a nullptr for where it came from, this will denote it as the origin. For reading the entire path, I'll build out a recursive method that backtracks through the pointer connections. Announcements will be memory safe with the same observer pattern I used for the graph itself; a Nodes local rib store a unique ptr to the location of the announcement, and all other pointers will be observers of this original unique ptr.
 
