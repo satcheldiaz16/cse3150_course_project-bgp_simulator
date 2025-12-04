@@ -1,0 +1,4 @@
+output.csv filter=lfs diff=lfs merge=lfs -text
+p_output.csv filter=lfs diff=lfs merge=lfs -text
+sp_output.csv filter=lfs diff=lfs merge=lfs -text
+CMakeLists.txt filter=lfs diff=lfs merge=lfs -text

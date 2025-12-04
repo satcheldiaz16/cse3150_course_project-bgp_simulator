@@ -1,32 +1,3 @@
-cmake_minimum_required(VERSION 3.14)
-project(BGPSimulator)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-include_directories(include)
-
-set(SOURCE_FILES
-	src/ASGraph.cpp
-    src/Policy.cpp
-    src/Announcement.cpp
-    src/BGP.cpp
-    src/ROV.cpp
-    src/ASNode.cpp
-)
-
-add_executable(bgp_simulator src/main.cpp ${SOURCE_FILES})
-
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-
-add_executable(run_tests
-	tests/GraphTests.cpp
-	${SOURCE_FILES}
-)
-
-#previously target_link_libraries(run_tests ${GTEST_LIBRARIES} pthread)
-target_link_libraries(run_tests GTest::gtest GTest::gtest_main pthread)
-
-enable_testing()
-add_test(NAME GraphTests COMMAND run_tests)
+version https://git-lfs.github.com/spec/v1
+oid sha256:9f73aa8ef583019f132b519d18a77145b2d250f29147e595a3a7a9badef91a7f
+size 692
