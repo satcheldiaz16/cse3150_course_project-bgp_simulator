@@ -360,7 +360,10 @@ int ASGraph::output_graph(const std::string& filepath){
 
 
     for(auto& node_pair : as_nodes_){
+        std::cout << "where exactly is the fault" << std::endl;
         for(auto& rib_entry : node_pair.second->policy()->get_rib()){
+            std::cout << "is it the prefix?" << node_pair.first << std::endl;
+            
             output_file << node_pair.first << ","
                 << rib_entry.first << ",\""
                 << rib_entry.second->format_path() << "\"\n";
