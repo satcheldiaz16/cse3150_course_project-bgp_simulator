@@ -67,5 +67,9 @@ bool Announcement::operator<(const Announcement& other) const{
     size_t other_path_length = other.path_size;
     if (this_path_length != other_path_length) { return this_path_length < other_path_length; }
 
-    return next_hop_asn() < other.next_hop_asn();
+    // Tiebreaker: compare the announcing peer (sender), which is the second-to-last AS in the path
+    // (last AS is always the current node for announcements in the RIB)
+    uint32_t this_sender = path.size() == 1 ? path[0] : path[path.size()-2];
+    uint32_t other_sender = other.path.size() == 1 ? other.path[0] : other.path[other.path.size()-2];
+    return this_sender < other_sender;
 }

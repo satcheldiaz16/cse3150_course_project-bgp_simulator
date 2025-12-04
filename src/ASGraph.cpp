@@ -299,9 +299,13 @@ int ASGraph::seed_announcements(const std::string& filepath){
         while(std::getline(ss, cell, ',')){
             row_data.push_back(cell);
         }
-        
-        bool b;
-        std::istringstream(row_data[2]) >> std::boolalpha >> b;
+
+        // Remove trailing carriage return if present (Windows line endings)
+        if(!row_data.empty() && !row_data.back().empty() && row_data.back().back() == '\r') {
+            row_data.back().pop_back();
+        }
+
+        bool b = (row_data[2] == "True" || row_data[2] == "true");
 
         seed_announcement(std::stoi(row_data[0]), row_data[1], b);
     }

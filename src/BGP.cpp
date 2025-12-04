@@ -60,6 +60,18 @@ void BGP::process_announcements(ASNode* host){
 
 void BGP::send_announcements(std::vector<ASNode*> recipients, Relationship r){
    for(auto& pair : local_rib_){
+       // BGP export rules (valley-free routing):
+       // - To providers (r=CUSTOMER): only send routes learned from customers
+       // - To peers (r=PEER): only send routes learned from customers
+       // - To customers (r=PROVIDER): send all routes
+       if(r == Relationship::CUSTOMER || r == Relationship::PEER) {
+           // Only announce customer routes to providers and peers
+           if(pair.second->relationship != Relationship::CUSTOMER &&
+              pair.second->relationship != Relationship::ORIGIN) {
+               continue; // Skip non-customer routes
+           }
+       }
+
        for(ASNode* recipient : recipients){
            recipient->policy()->recieve_announcement(pair.second, r);
        }
