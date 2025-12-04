@@ -26,29 +26,37 @@ void BGP::seed_announcement(const std::string& prefix, ASNode* host, bool rov_in
 void BGP::process_announcements(ASNode* host){
     for(auto& pair : recieved_queue_){
         std::vector<RecievedAnnouncement>& bucket = pair.second;
-auto best = bucket.begin();
-for(auto it = bucket.begin() + 1; it != bucket.end(); ++it){
-        if(*it < *best){  // if it is better than best
-                                   best = it;
-                                       }
-                                       }
-                                       // Keep only the best
-                                       RecievedAnnouncement best_ann = *best;
-                                       bucket.clear();
-                                       bucket.push_back(best_ann);
+        auto best = bucket.begin();
+        for(auto it = bucket.begin() + 1; it != bucket.end(); ++it){
+            if(*it < *best){  // if it is better than best
+                   best = it;
+            }
+       }
+           // Keep only the best
+       RecievedAnnouncement best_ann = *best;
+       bucket.clear();
+       bucket.push_back(best_ann);
         while(bucket.size() > 1){
             bucket[0] < bucket[1] ? bucket.erase(bucket.begin()+1) : bucket.erase(bucket.begin());
         }
-
-        local_rib_.insert({
-            pair.first,
-            std::make_unique<Announcement>(
+        
+        //now compare against announcement in RIB
+        
+        if(local_rib_.find(pair.first) != local_rib_.end()){
+            Announcement& ann = *local_rib_[pair.first];
+            if(*pair.second[0].announcement < ann){
+                ann.prev = pair.second[0].announcement->prev;
+                ann.relationship = pair.second[0].announcement->relationship;
+            }
+        }
+        else{
+            local_rib_[pair.first] =  std::make_unique<Announcement>(
                 *pair.second[0].announcement,
                 pair.second[0].relationship,
                 host,
                 pair.second[0].announcement
-            )
-        }); 
+            );
+        }
     }
 
     recieved_queue_.clear();

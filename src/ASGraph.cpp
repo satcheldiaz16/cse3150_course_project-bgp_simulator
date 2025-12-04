@@ -105,6 +105,63 @@ void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){
     }
 }
 
+void ASGraph::flatten_top_down(uint32_t &nodes_processed) {
+    std::cout << "flattening top-down" << std::endl;
+
+    // 1. Identify all ASes with NO providers → rank 0
+    std::vector<ASNode*> queue;
+
+    for (auto &pair : as_nodes_) {
+        ASNode *node = pair.second.get();
+        node->remaining_degree_ = node->num_providers(); // incoming edges = providers
+
+        if (node->remaining_degree_ == 0) {
+            flattened_[0].push_back(node);
+            queue.push_back(node);
+        }
+    }
+
+    if (queue.empty()) {
+        std::cerr << "No root ASes (provider-less). Graph invalid or has cycle.\n";
+        return;
+    }
+
+    // 2. BFS downward through customers
+    size_t rank = 0;
+
+    while (!queue.empty()) {
+        std::vector<ASNode*> next_queue;
+
+        for (ASNode *node : queue) {
+
+            // consume this node
+            nodes_processed++;
+
+            // for each outgoing edge (node → customer)
+            for (ASNode *cus : node->customers()) {
+
+                // decrement their provider dependency count
+                cus->remaining_degree_--;
+
+                // if all providers have been processed, assign rank and enqueue
+                if (cus->remaining_degree_ == 0) {
+                    if (flattened_.size() <= rank + 1)
+                        flattened_.push_back({});
+                    flattened_[rank + 1].push_back(cus);
+                    next_queue.push_back(cus);
+                }
+            }
+        }
+
+        queue = std::move(next_queue);
+        rank++;
+    }
+
+    std::cout << "Top-down ranks: " << flattened_.size() << std::endl;
+
+    std::reverse(flattened_.begin(), flattened_.end());
+}
+/*
 void ASGraph::flatten_top_down(uint32_t& nodes_processed){
     std::cout << "flattening top-down" << std::endl;
     
@@ -141,7 +198,7 @@ void ASGraph::flatten_top_down(uint32_t& nodes_processed){
     //reverse flattened_ since flattening top down
     std::reverse(flattened_.begin(), flattened_.end());
 }
-
+*/
 void ASGraph::seed_announcement(uint32_t asn, std::string& prefix, bool rov_invalid){
     ASNode* node = &get_node(asn);
     
@@ -190,7 +247,7 @@ int ASGraph::build_graph(const std::string& filepath){
         
 		if (cur_line.empty() || cur_line[0] == '#') {      
 	        // input clique scenario
-            if(cur_line.rfind(input_clique_prefix, 0) == 0 && false){
+            if(cur_line.rfind(input_clique_prefix, 0) == 0){
                 build_input_clique(cur_line, nodes_created);
             }
             

@@ -37,5 +37,5 @@ public:
     std::string path() const;
     //    std::vector<uint32_t> path() const;
     const std::string format_path();
-//    bool operator<(const Announcement& other) const;
+    bool operator<(const Announcement& other) const;
 };

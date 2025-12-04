@@ -55,13 +55,13 @@ const std::string Announcement::format_path(){
 
 
     return std::move(str_path);*/
-}/*
+}
 bool Announcement::operator<(const Announcement& other) const{
     if(relationship != other.relationship) { return relationship < other.relationship; }
 
-    size_t this_path_length = path().size();
-    size_t other_path_length = path().size();
+    size_t this_path_length = path_size;
+    size_t other_path_length = path_size;
     if (this_path_length != other_path_length) { return this_path_length < other_path_length; }
 
     return next_hop_asn() < other.next_hop_asn();
-}*/
+}
