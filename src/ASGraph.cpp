@@ -273,6 +273,8 @@ int ASGraph::build_graph(const std::string& filepath){
 
     //if there is a cycle error out
     if(nodes_processed < nodes_created){
+        std::cerr << "Error: Cycle detected in AS graph. Processed " << nodes_processed
+                  << " nodes but created " << nodes_created << " nodes." << std::endl;
         return 1;
     }
 

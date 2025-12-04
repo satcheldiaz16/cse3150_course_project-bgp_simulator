@@ -16,9 +16,14 @@ public:
 TEST_F(GraphTest, TestInput1){
 	ASGraph graph;
 
-	graph.build_graph("../tests/test_input_1.txt");
+	int result = graph.build_graph("../tests/test_input_1.txt");
 
-	std::cout << graph << std::endl;
+	// Expect the build to fail due to cycle detection
+	EXPECT_EQ(result, 1) << "Expected cycle detection to return 1";
+
+	if(result == 0) {
+		std::cout << graph << std::endl;
+	}
 }
 
 TEST_F(GraphTest, RealInput){
