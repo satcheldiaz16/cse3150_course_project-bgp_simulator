@@ -51,7 +51,6 @@ void ASGraph::try_modify_node_relationship(ASNode& prv, ASNode& cus, bool& money
 const std::string input_clique_prefix = "# input clique:";
 
 void ASGraph::build_input_clique(const std::string& cur_line, uint32_t& nodes_created){
-    std::cout << "we are in here" << std::endl;
     //std::string token;
     std::string line = cur_line.substr(input_clique_prefix.size());
     std::istringstream iss(line);
@@ -61,11 +60,10 @@ void ASGraph::build_input_clique(const std::string& cur_line, uint32_t& nodes_cr
         //asn = std::stoi(token);
         ASNode& as = get_or_build_node(asn, nodes_created);
         flattened_[0].push_back(&as);
-    } 
+    }
 }
 
-void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){ 
-    std::cout << "flattening bottom-up" << std::endl;
+void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){
     //set rank 0 nodes
     //ref to unique ptr in this case, kind of gross but whatever
     //
@@ -106,8 +104,6 @@ void ASGraph::flatten_bottom_up(uint32_t& nodes_processed){
 }
 
 void ASGraph::flatten_top_down(uint32_t &nodes_processed) {
-    std::cout << "flattening top-down" << std::endl;
-
     // 1. Identify all ASes with NO providers → rank 0
     std::vector<ASNode*> queue;
 
@@ -156,8 +152,6 @@ void ASGraph::flatten_top_down(uint32_t &nodes_processed) {
         queue = std::move(next_queue);
         rank++;
     }
-
-    std::cout << "Top-down ranks: " << flattened_.size() << std::endl;
 
     std::reverse(flattened_.begin(), flattened_.end());
 }
@@ -277,8 +271,6 @@ int ASGraph::build_graph(const std::string& filepath){
     //if input clique was obtained, flatten top down, else bottom up
     flattened_[0].size() > 0 ? flatten_top_down(nodes_processed) : flatten_bottom_up(nodes_processed);
 
-    std::cout << "num ranks = " << flattened_.size() << std::endl;
-
     //if there is a cycle error out
     if(nodes_processed < nodes_created){
         return 1;
@@ -319,27 +311,24 @@ int ASGraph::seed_announcements(const std::string& filepath){
 
 int ASGraph::propogate_announcements(){
     for(auto rank = flattened_.begin(); rank != flattened_.end(); rank++){
-       
         for(auto node = rank->begin(); node != rank->end(); node++){
-            (*node)->policy()->process_announcements(*node);    
+            (*node)->policy()->process_announcements(*node);
         }
         for(auto node = rank->begin(); node != rank->end(); node++){
-            (*node)->announce_up();    
+            (*node)->announce_up();
         }
     }
     for(auto rank = flattened_.begin(); rank != flattened_.end(); rank++){
-        
         for(auto node = rank->begin(); node != rank->end(); node++){
-            (*node)->policy()->process_announcements(*node);    
+            (*node)->policy()->process_announcements(*node);
         }
         for(auto node = rank->begin(); node != rank->end(); node++){
             (*node)->announce_across();
         }
     }
     for(auto rank = flattened_.rbegin(); rank != flattened_.rend(); rank++){
-        
         for(auto node = rank->rbegin(); node != rank->rend(); node++){
-            (*node)->policy()->process_announcements(*node);    
+            (*node)->policy()->process_announcements(*node);
         }
         for(auto node = rank->rbegin(); node != rank->rend(); node++){
             (*node)->announce_down();
@@ -358,12 +347,8 @@ int ASGraph::output_graph(const std::string& filepath){
 
     output_file << "asn,prefix,as_path\n";
 
-
     for(auto& node_pair : as_nodes_){
-        std::cout << "where exactly is the fault" << std::endl;
         for(auto& rib_entry : node_pair.second->policy()->get_rib()){
-            std::cout << "is it the prefix?" << node_pair.first << std::endl;
-            
             output_file << node_pair.first << ","
                 << rib_entry.first << ",\""
                 << rib_entry.second->format_path() << "\"\n";

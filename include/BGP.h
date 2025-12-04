@@ -11,12 +11,12 @@
 class ASNode;//#include "ASNode.h"
 
 class BGP : public Policy{
-    std::unordered_map<std::string, std::unique_ptr<Announcement>> local_rib_;
+    std::unordered_map<std::string, std::shared_ptr<Announcement>> local_rib_;
     std::unordered_map<std::string, std::vector<RecievedAnnouncement>> recieved_queue_;
 public:
-    virtual void recieve_announcement(Announcement* ann, Relationship r) override;
+    virtual void recieve_announcement(std::shared_ptr<Announcement> ann, Relationship r) override;
     void seed_announcement(const std::string& prefix, ASNode* host, bool rov_invalid) override;
-    void process_announcements(ASNode* host) final override;        
+    void process_announcements(ASNode* host) final override;
     void send_announcements(std::vector<ASNode*> recipients, Relationship r) final override;
-    const std::unordered_map<std::string, std::unique_ptr<Announcement>>& get_rib() const final override;
+    const std::unordered_map<std::string, std::shared_ptr<Announcement>>& get_rib() const final override;
 };

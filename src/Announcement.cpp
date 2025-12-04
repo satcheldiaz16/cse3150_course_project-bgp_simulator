@@ -10,26 +10,28 @@ Announcement::Announcement(const std::string& pref, ASNode* ho, bool rov_inv){
     host = ho;
     relationship = Relationship::ORIGIN;
     rov_invalid = rov_inv;
+    path.push_back(ho->asn());
 }
-Announcement::Announcement(const Announcement& other, Relationship r, ASNode* ho, Announcement* p){
+Announcement::Announcement(const Announcement& other, Relationship r, ASNode* ho){
     prefix = other.prefix;
     path_size = other.path_size + 1;
     host = ho;
     relationship = r;
-    prev = p;
-    //next_hop_asn = prev->host->asn();
+    path = other.path;
+    path.push_back(host->asn());
+//    prev = p;
+//    next_hop_as = next_hop;
     rov_invalid = other.rov_invalid;
 }
 uint32_t Announcement::next_hop_asn() const{
-    if(prev == nullptr) return host->asn();
-
-    return prev->host->asn();
+    return path[path.size() == 1 ? 0 : path.size()-2];
 }
+/*
 std::string Announcement::path() const{
     if(prev == nullptr) return std::to_string(host->asn());
     return std::to_string(host->asn()) + ", " + prev->path(); 
 }
-/*
+
 std::vector<uint32_t> Announcement::path() const{
     std::vector<uint32_t> vec = prev == nullptr ? std::vector<uint32_t>() : prev->path();
     
@@ -39,29 +41,30 @@ std::vector<uint32_t> Announcement::path() const{
 }
 */
 const std::string Announcement::format_path(){
-    return "(" + path() + ")";
-/*
     std::string str_path = "(";
-    std::vector<uint32_t> vec_path = path();
 
-    for(int i = 0; i < vec_path.size(); i++){
-        str_path += std::to_string(vec_path[i]);
-        
-        if (i != vec_path.size()-1){
+    for(int i = path.size()-1; i >= 0; i--){
+        str_path += std::to_string(path[i]);
+       // str_path += ",";
+
+        if (i != 0){
             str_path += ", ";
+        }
+        if(path.size() == 1){
+            str_path+=",";
         }
     }
 
     str_path += ")";
 
 
-    return std::move(str_path);*/
+    return std::move(str_path);
 }
 bool Announcement::operator<(const Announcement& other) const{
     if(relationship != other.relationship) { return relationship < other.relationship; }
 
     size_t this_path_length = path_size;
-    size_t other_path_length = path_size;
+    size_t other_path_length = other.path_size;
     if (this_path_length != other_path_length) { return this_path_length < other_path_length; }
 
     return next_hop_asn() < other.next_hop_asn();
